@@ -1,29 +1,50 @@
 const fs = require("fs");
 const path = require("path");
 
-// Path to your image folder
-const folder = path.join(__dirname, "../../images/outfits/fyp/friends");
-
-// Path where images.json should be saved
+// Define folders to include
+const basePath = path.join(__dirname, "../../images/outfits/fyp");
 const outputPath = path.join(__dirname, "../../../data/images.json");
 
-fs.readdir(folder, (err, files) => {
-  if (err) throw err;
+const folders = ["friends", "trending"]; // 🧩 Add more later if needed
 
-  // Only include image files
-  const imageFiles = files.filter(file =>
-    /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
-  );
+// Helper to get image files in a folder
+function getImageFiles(folderPath) {
+  const exts = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+  return fs
+    .readdirSync(folderPath, { withFileTypes: true })
+    .filter((f) => f.isFile() && exts.includes(path.extname(f.name).toLowerCase()))
+    .map((f) => f.name);
+}
 
-  // Create JSON array with relative paths
-  const json = JSON.stringify(
-    imageFiles.map(file => "/assets/images/outfits/fyp/friends/" + file),
-    null,
-    2
-  );
+function generateImageData() {
+  const allImages = [];
 
-  // Write JSON file
-  fs.writeFileSync(outputPath, json);
+  folders.forEach((page) => {
+    const folderPath = path.join(basePath, page);
 
-  console.log(`✅ images.json generated with ${imageFiles.length} images at ${outputPath}`);
-});
+    if (!fs.existsSync(folderPath)) {
+      console.warn(`⚠️ Folder not found: ${folderPath}`);
+      return;
+    }
+
+    const files = getImageFiles(folderPath);
+
+    files.forEach((file) => {
+      allImages.push({
+        url: `/assets/images/outfits/fyp/${page}/${file}`,
+        page: page,
+      });
+    });
+  });
+
+  return allImages;
+}
+
+function saveImageData() {
+  const data = generateImageData();
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
+  console.log(`✅ Saved ${data.length} image entries to ${outputPath}`);
+}
+
+saveImageData();

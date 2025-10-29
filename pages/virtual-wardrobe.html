@@ -3,15 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Virtual Wardobe</title>
+  <title>Virtual Wardrobe</title>
+  <link rel="stylesheet" href="/assets/css/virtual-wardrobe.css">
 </head>
 
 <body>
   <div id="header-placeholder"></div>
-  <div id="footer-placeholder"></div>
 
-  <div id="create-account-page-placeholder"></div>
+  <!-- Wardrobe Content -->
+  <div id="wardrobe-root">
+    <div class="wardrobe-container">
+      <!-- Header -->
+      <div class="wardrobe-header">
+        <h1 class="wardrobe-title">My Wardrobe</h1>
+        <p class="wardrobe-subtitle">Organize and manage your clothing collection</p>
+      </div>
+
+      <!-- View Mode Toggle -->
+      <div class="view-toggle">
+        <button id="items-view-btn" class="view-btn active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+          Items
+        </button>
+        <button id="outfits-view-btn" class="view-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+          Outfits
+        </button>
+      </div>
+
+      <!-- Search and Filter Bar -->
+      <div class="search-bar">
+        <div class="search-controls">
+          <div class="search-input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Search items..."
+            />
+          </div>
+          <select id="category-filter" class="category-filter">
+            <option value="all">All Categories</option>
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="dresses">Dresses</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="shoes">Shoes</option>
+            <option value="accessories">Accessories</option>
+          </select>
+          <button id="add-item-btn" class="add-item-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add Item
+          </button>
+        </div>
+      </div>
+
+      <!-- Items Grid -->
+      <div id="items-view" class="items-grid">
+        <!-- Items will be populated by JavaScript -->
+      </div>
+
+      <!-- Outfits Grid -->
+      <div id="outfits-view" class="outfits-grid hidden">
+        <!-- Outfits will be populated by JavaScript -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <svg id="empty-icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+        <p id="empty-title" class="empty-title">No items found</p>
+        <p id="empty-message" class="empty-message">Add your first clothing item to get started!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div id="add-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Item</h2>
+        <button id="close-modal-btn" class="close-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Add Method Tabs -->
+      <div class="method-tabs">
+        <button id="upload-tab" class="method-tab active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+          Upload
+        </button>
+        <button id="url-tab" class="method-tab">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          URL
+        </button>
+      </div>
+
+      <!-- Upload Input -->
+      <div id="upload-input" class="form-group">
+        <label class="form-label">Upload Image</label>
+        <input
+          type="file"
+          id="file-input"
+          accept="image/*"
+          class="form-input"
+        />
+      </div>
+
+      <!-- URL Input -->
+      <div id="url-input" class="form-group hidden">
+        <label class="form-label">Image URL</label>
+        <input
+          type="url"
+          id="url-text-input"
+          placeholder="https://example.com/image.jpg"
+          class="form-input"
+        />
+      </div>
+
+      <!-- Image Preview -->
+      <div id="image-preview" class="image-preview hidden">
+        <img id="preview-img" src="" alt="Preview" class="preview-img" />
+      </div>
+
+      <!-- Item Name -->
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input
+          type="text"
+          id="item-name-input"
+          placeholder="e.g., Blue Denim Jacket"
+          class="form-input"
+        />
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="category-input" class="form-select">
+          <option value="tops">Tops</option>
+          <option value="bottoms">Bottoms</option>
+          <option value="dresses">Dresses</option>
+          <option value="outerwear">Outerwear</option>
+          <option value="shoes">Shoes</option>
+          <option value="accessories">Accessories</option>
+        </select>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button id="cancel-btn" class="btn-cancel">
+          Cancel
+        </button>
+        <button id="save-item-btn" class="btn-save">
+          Add Item
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/assets/js/pages/page-defaults.js"></script>
+  <script type="module" src="/assets/js/pages/virtual-wardrobe.js"></script>
+  <script type="module" src="/assets/js/components/load-user.js"></script>
 </body>
 </html>

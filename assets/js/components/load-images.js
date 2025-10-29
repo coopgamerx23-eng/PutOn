@@ -7,44 +7,63 @@ function shuffleArray(array) {
     return shuffled;
 }
 
-export default async function loadImages() {
+export default async function loadImages(filterPage = null) {
     const response = await fetch("/data/images.json");
     let images = await response.json();
-    images = shuffleArray(images);
+
+    // If the JSON is an array of objects, not strings
+    if (images.length && typeof images[0] !== "string") {
+        if (filterPage) {
+            images = images.filter(img => img.page === filterPage);
+        }
+
+        images = shuffleArray(images);
+    } else {
+        images = shuffleArray(images);
+    }
+
     const gallery = document.getElementById("gallery");
-    
+    gallery.innerHTML = ""; // clear existing images
+
+    if (images.length === 0) {
+        gallery.classList.add("no-images");
+        const message = document.createElement("p");
+        if (filterPage === "friends") message.textContent = "You currently have no friends added.";
+        if (filterPage == "following") message.textContent = "You are not currently following any creators.";
+        message.classList.add("no-medium-message");
+        gallery.appendChild(message);
+        return []; // stop here so nothing else runs
+    } else {
+        gallery.classList.remove("no-images");
+    }
+
     const imageElements = [];
-    
-    images.forEach(src => {
+
+    images.forEach(imgData => {
+        const src = typeof imgData === "string" ? imgData : imgData.url;
         const img = document.createElement("img");
         img.src = src;
         img.classList.add("grid-image");
         gallery.appendChild(img);
         imageElements.push(img);
-        
-        // Calculate grid row span after image loads
-        img.addEventListener('load', function() {
-            resizeGridItem(img);
-        });
+
+        img.addEventListener("load", () => resizeGridItem(img));
     });
-    
-    // Recalculate on window resize or sidebar toggle
-    window.addEventListener('resize', () => {
+
+    window.addEventListener("resize", () => {
         imageElements.forEach(img => resizeGridItem(img));
     });
-    
-    // Watch for sidebar toggle (when columns change)
-    const observer = new MutationObserver(() => {
-        setTimeout(() => {
-            imageElements.forEach(img => resizeGridItem(img));
-        }, 100);
-    });
-    
+
     const sidebar = document.querySelector('.filter-side-bar');
     if (sidebar) {
+        const observer = new MutationObserver(() => {
+            setTimeout(() => {
+                imageElements.forEach(img => resizeGridItem(img));
+            }, 100);
+        });
         observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
     }
-    
+
     return imageElements;
 }
 

@@ -17,8 +17,6 @@
         <li><a href="#" class="new-page-button">BUILD OUTFIT</a></li>
         <li><a href="#" class="new-page-button">VIRTUAL WARDROBE</a></li>
         <li><a href="#" class="new-page-button">WISHLIST</a></li>
-        <li><a href="#" class="new-page-button">FIND ITEM</a></li>
-        <li><a href="#" class="new-page-button">SALES/DISCOUNTS</a></li>
       </ul>
     </nav>
 
@@ -36,8 +34,10 @@
             <p class="create-account"><u>CREATE ACCOUNT</u></p>
           </div>
 
-          <input type="text" placeholder="* EMAIL ADDRESS" class="sign-in-box">
-          <input type="text" placeholder="* PASSWORD" class="sign-in-box">
+          <p class="incorrect-sign-in-message">Sorry, this does not match our records. Check your spelling and try again.</p>
+
+          <input type="text" placeholder="* EMAIL ADDRESS" class="sign-in-box" id="sign-in-email">
+          <input type="text" placeholder="* PASSWORD" class="sign-in-box" id="sign-in-password">
 
           <div class="dropdown-password">
             <p class="forgot-password-button"><u>Forgot Password?</u></p>
@@ -52,7 +52,7 @@
             <p id="details"><u>Details</u></p>
           </div>
 
-          <button>SIGN IN</button>
+          <button class="sign-in-button">SIGN IN</button>
         </div>
       </div>
 

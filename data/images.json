@@ -1,43 +1,297 @@
 [
-  "/assets/images/outfits/fyp/friends/fxn_2025-07-08_230212.568.jpg",
-  "/assets/images/outfits/fyp/friends/fxn_2025-07-08_232121.259.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_0033.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_1686.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_3075.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_3905.JPG",
-  "/assets/images/outfits/fyp/friends/IMG_4383.JPG",
-  "/assets/images/outfits/fyp/friends/IMG_4687.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4688.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4689.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4690.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4691.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4692.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4693.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4694.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4695.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4696.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4697.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4698.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4699.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4700.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4701.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4702.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4705.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4706.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4708.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4709.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4710.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4711.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4713.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4714.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4715.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4716.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4717.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4718.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_4731.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_6656.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_6884.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_7358.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_7361.jpg",
-  "/assets/images/outfits/fyp/friends/IMG_7392.jpg"
+  {
+    "url": "/assets/images/outfits/fyp/friends/fxn_2025-07-08_230212.568.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/fxn_2025-07-08_232121.259.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_0033.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_1686.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_3075.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_3905.JPG",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4383.JPG",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4687.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4688.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4689.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4690.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4691.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4692.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4693.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4694.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4695.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4696.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4697.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4698.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4699.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4700.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4701.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4702.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4705.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4706.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4708.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4709.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4710.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4711.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4713.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4714.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4715.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4716.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4717.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4718.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4731.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_6656.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_6884.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_7358.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_7361.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_7392.jpg",
+    "page": "fyp",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (10).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (11).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (12).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (13).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (14).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (15).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (16).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (17).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (18).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (2).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (3).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (4).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (5).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (6).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (7).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (8).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp (9).jpg",
+    "page": "trending",
+    "gender": "male"
+  },
+  {
+    "url": "/assets/images/outfits/fyp/trending/fyp.jpg",
+    "page": "trending",
+    "gender": "male"
+  }
 ]

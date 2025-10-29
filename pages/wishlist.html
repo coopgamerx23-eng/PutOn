@@ -1,17 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>wishlist</title>
-
-  <link rel="stylesheet" href="/assets/css/virtual-wardrobe.css">
+  <title>Wishlist</title>
+  <link rel="stylesheet" href="/assets/css/wishlist.css">
 </head>
 
 <body>
   <div id="header-placeholder"></div>
 
-  <div id="create-account-page-placeholder"></div>
+  <!-- Wishlist Content -->
+  <div id="wishlist-root">
+    <div class="wishlist-container">
+      <!-- Header -->
+      <div class="wishlist-header">
+        <h1 class="wishlist-title">My Wishlist</h1>
+        <p class="wishlist-subtitle">Keep track of items you want to add to your wardrobe</p>
+      </div>
 
-  <div id="footer-placeholder"></div>
+      <!-- Search and Filter Bar -->
+      <div class="search-bar">
+        <div class="search-controls">
+          <div class="search-input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Search wishlist items..."
+            />
+          </div>
+          <select id="category-filter" class="category-filter">
+            <option value="all">All Categories</option>
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="dresses">Dresses</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="shoes">Shoes</option>
+            <option value="accessories">Accessories</option>
+          </select>
+          <select id="priority-filter" class="priority-filter">
+            <option value="all">All Priorities</option>
+            <option value="high">High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Wishlist Grid -->
+      <div id="wishlist-view" class="wishlist-grid">
+        <!-- Items will be populated by JavaScript -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        <p class="empty-title">No wishlist items found</p>
+        <p class="empty-message">Add items you'd like to purchase in the future!</p>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/assets/js/pages/page-defaults.js"></script>
+  <script type="module" src="/assets/js/pages/wishlist.js"></script>
+  <script type="module" src="/assets/js/components/load-user.js"></script>
 </body>
+</html>

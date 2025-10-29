@@ -42,32 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function saveItemToPutOns(item) {
-        try {
-            // Get existing items from localStorage
-            const existingItems = JSON.parse(localStorage.getItem('putOns') || '[]');
+    // function saveItemToPutOns(item) {
+    //     try {
+    //         // Get existing items from localStorage
+    //         const existingItems = JSON.parse(localStorage.getItem('putOns') || '[]');
             
-            // Add unique ID and timestamp
-            const itemToSave = {
-                ...item,
-                id: Date.now() + Math.random(), // Unique ID
-                addedAt: new Date().toISOString(),
-                sourceImage: images[currentIndex]?.src || ''
-            };
+    //         // Add unique ID and timestamp
+    //         const itemToSave = {
+    //             ...item,
+    //             id: Date.now() + Math.random(), // Unique ID
+    //             addedAt: new Date().toISOString(),
+    //             sourceImage: images[currentIndex]?.src || ''
+    //         };
             
-            // Add to array
-            existingItems.push(itemToSave);
+    //         // Add to array
+    //         existingItems.push(itemToSave);
             
-            // Save back to localStorage
-            localStorage.setItem('putOns', JSON.stringify(existingItems));
+    //         // Save back to localStorage
+    //         localStorage.setItem('putOns', JSON.stringify(existingItems));
             
-            console.log('✅ Item saved to Put Ons:', itemToSave);
-            return true;
-        } catch (error) {
-            console.error('❌ Error saving item:', error);
-            return false;
-        }
-    }
+    //         console.log('✅ Item saved to Put Ons:', itemToSave);
+    //         return true;
+    //     } catch (error) {
+    //         console.error('❌ Error saving item:', error);
+    //         return false;
+    //     }
+    // }
 
     // ========================================
     // AI CLOTHING DETECTION FUNCTION
@@ -143,14 +143,21 @@ document.addEventListener("DOMContentLoaded", () => {
                             <path d="M2 2L6 6M14 2L10 6M2 14L6 10M14 14L10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </button>
-                    <div class="clothing-item-content">
-                        <h3>${item.type}</h3>
-                        <p><strong>Item:</strong> ${item.name}</p>
-                        <p class="brand"><strong>Brand:</strong> ${item.brand}</p>
-                        <p><strong>Color:</strong> ${item.color}</p>
-                        <p><strong>Size:</strong> ${item.size}</p>
-                        <p class="price">${item.price}</p>
-                        ${item.confidence ? `<p style="font-size: 11px; color: #999;">Confidence: ${item.confidence}%</p>` : ''}
+                    <div class="clothing-item-header">
+                        <div class="clothing-item-content">
+                            <h3>${item.type}</h3>
+                            <p><strong>Item:</strong> ${item.name}</p>
+                            <p class="brand"><strong>Brand:</strong> ${item.brand}</p>
+                            <p><strong>Color:</strong> ${item.color}</p>
+                            <p><strong>Size:</strong> ${item.size}</p>
+                            <p class="price">${item.price}</p>
+                            ${item.confidence ? `<p style="font-size: 11px; color: #999;">Confidence: ${item.confidence}%</p>` : ''}
+                        </div>
+                        <div class="clothing-item-image">
+                            <img src="${item.image || '/assets/images/icons/placeholder.jpg'}" 
+                                alt="${item.name}" 
+                                onerror="this.src='/assets/images/icons/placeholder.jpg'">
+                        </div>
                     </div>
                     <div class="expanded-content" style="display: none;">
                         <p><strong>Material:</strong> ${item.material || 'Cotton blend'}</p>
@@ -159,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <p><strong>Description:</strong> ${item.description || 'A versatile piece perfect for any occasion.'}</p>
                         <div class="action-buttons">
                             <button class="btn-find-replacements" data-index="${index}">Find Replacements</button>
+                            <button class="btn-add-wishlist" data-index="${index}">Add to Wishlist</button>
                             <button class="btn-add-pieces" data-index="${index}">Add to Your Pieces</button>
                         </div>
                     </div>
@@ -205,6 +213,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 handleAddToPieces(currentItems[index], btn);
             });
         });
+
+        const addWishlistBtns = clothingDetails.querySelectorAll('.btn-add-wishlist');
+        addWishlistBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = parseInt(btn.dataset.index);
+                handleAddWishlist(currentItems[index], btn);
+            });
+        });
     }
 
     function handleFindReplacements(item) {
@@ -212,26 +229,120 @@ document.addEventListener("DOMContentLoaded", () => {
         // Add your replacement finding logic here
     }
 
-    function handleAddToPieces(item, button) {
-        const success = saveItemToPutOns(item);
-        
-        if (success) {
-            // Visual feedback
-            button.textContent = '✓ Added!';
-            button.style.background = '#4CAF50';
+    async function handleAddToPieces(item, button) {
+        try {
+            // Build item data
+            const pieceData = {
+            name: item.name || "Unnamed item",
+            type: item.type || "Unknown",
+            brand: item.brand || "",
+            color: item.color || "",
+            size: item.size || "",
+            price: item.price || "",
+            image: item.image || "",
+            category: item.category || "misc",
+            notes: item.notes || "",
+            sourceImage: images[currentIndex]?.src || ""
+            };
+
+            // Send to backend
+            const res = await fetch("http://localhost:3000/api/putons", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include", // keep session cookies
+                body: JSON.stringify(pieceData)
+            });
+
+            const text = await res.text();
+            console.log("📥 Raw response (pieces):", text);
+
+            let data;
+            try {
+            data = JSON.parse(text);
+            } catch {
+            throw new Error("Invalid JSON response (probably HTML)");
+            }
+
+            if (data.success) {
+            console.log("✅ Added to Your Pieces:", data);
+            showNotification("Item added to Your Pieces!");
+
+            const originalWidth = button.offsetWidth;
+            const originalHeight = button.offsetHeight;
+
+            button.textContent = "✓ Added!";
+            button.style.background = "#4CAF50";
+            button.style.width = `${originalWidth}px`;
+            button.style.height = `${originalHeight}px`;
             button.disabled = true;
-            
-            // Show success message
-            showNotification('Item added to Put Ons!');
-            
-            // Reset button after 2 seconds
+
             setTimeout(() => {
-                button.textContent = 'Add to Put Ons';
-                button.style.background = '';
+                button.textContent = "Add to Your Pieces";
+                button.style.background = "";
                 button.disabled = false;
             }, 2000);
-        } else {
-            showNotification('Failed to add item. Please try again.', 'error');
+            } else if (res.status === 401) {
+            alert("Please log in to save pieces.");
+            } else {
+            console.error("❌ Failed to add piece:", data.message);
+            showNotification("Failed to save piece.", "error");
+            }
+
+        } catch (err) {
+            console.error("❌ Error adding piece:", err);
+            showNotification("Error saving piece. Please try again.", "error");
+        }
+    }
+
+    async function handleAddWishlist(item) {
+        try {
+            // Build item data
+            const wishlistItem = {
+                name: item.name || "Unnamed item",
+                type: item.type || "Unknown",
+                brand: item.brand || "",
+                color: item.color || "",
+                size: item.size || "",
+                price: item.price || "",
+                image: item.image || "",
+                category: item.category || "misc",
+                notes: item.notes || ""
+            };
+
+            // ✅ Use full backend URL (change port if needed)
+            const res = await fetch("http://localhost:3000/api/wishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(wishlistItem),
+
+                // ✅ Include cookies (session)
+                credentials: "include"
+            });
+
+            // ✅ Parse safely
+            const text = await res.text();
+            console.log("📥 Raw wishlist response:", text);
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch {
+                throw new Error("Invalid JSON response (probably HTML)");
+            }
+
+            if (data.success) {
+                console.log("✅ Added to wishlist:", data.item);
+                alert("Added to wishlist!");
+            } else if (res.status === 401) {
+                alert("Please log in to add items to your wishlist.");
+            } else {
+                console.error("❌ Failed to add to wishlist:", data.message);
+                alert("Error adding to wishlist.");
+            }
+
+        } catch (err) {
+            console.error("❌ Error adding to wishlist:", err);
+            alert("Error adding to wishlist.");
         }
     }
 
@@ -346,7 +457,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function openImage(index) {
-        if (!reel) {
+        if (!reel || reel.querySelectorAll(".reel-image").length !== images.length) {
+            if (reel) reel.remove();
             createReel();
         }
         

@@ -46,7 +46,13 @@ const PORT = process.env.PORT || 3000;
 
 
 // --- Middleware ---
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Your frontend URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
@@ -220,6 +226,42 @@ let db;
         email TEXT UNIQUE,
         password_hash TEXT
       );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS wishlist (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        name TEXT,
+        type TEXT,
+        brand TEXT,
+        color TEXT,
+        size TEXT,
+        price TEXT,
+        image TEXT,
+        category TEXT,
+        notes TEXT,
+        addedAt TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      );
+    `);
+
+    await db.exec(`
+    CREATE TABLE IF NOT EXISTS putons (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      name TEXT,
+      type TEXT,
+      brand TEXT,
+      color TEXT,
+      size TEXT,
+      price TEXT,
+      image TEXT,
+      category TEXT,
+      notes TEXT,
+      source_image TEXT,
+      added_at TEXT
+    );
     `);
 
 
@@ -424,85 +466,115 @@ app.post('/api/detect-clothing', async (req, res) => {
 
 // ✅ Login route
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  const user = await db.get("SELECT * FROM users WHERE username = ?", [username]);
-  if (!user) return res.status(400).send("User not found");
-  const match = await bcrypt.compare(password, user.password_hash);
-  if (!match) return res.status(400).send("Incorrect password");
-  req.session.userId = user.id;
-  res.send("Login successful!");
+  try {
+    const { username, password } = req.body;
+
+    // Validate inputs early
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: "Missing username or password" });
+    }
+
+    // Find user in database
+    const user = await db.get("SELECT * FROM users WHERE email = ?", [username]);
+    if (!user) {
+      return res.status(400).json({ success: false, message: "User not found" });
+    }
+
+    // Check password
+    const match = await bcrypt.compare(password, user.password_hash);
+    if (!match) {
+      return res.status(400).json({ success: false, message: "Incorrect password" });
+    }
+
+    // Create session
+    req.session.userId = user.id;
+
+    // ✅ Send JSON response
+    res.json({
+      success: true,
+      message: "Login successful!",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ success: false, message: "Server error during login" });
+  }
 });
 
 
-  // Signup route
-  app.post("/signup", async (req, res) => {
-    const { name, username, email, password } = req.body;
-    if (!name)
-      return res.status(400).json({success: false, message: "missing name-required"});
-    if (!username)
-      return res.status(400).json({success: false, message: "missing username-required"});
-    if (!email)
-      return res.status(400).json({success: false, message: "missing email-required"});
-    if (!password)
-      return res.status(400).json({success: false, message: "missing password-required"});
+// Signup route
+app.post("/signup", async (req, res) => {
+  const { name, username, email, password } = req.body;
+  if (!name)
+    return res.status(400).json({success: false, message: "missing name-required"});
+  if (!username)
+    return res.status(400).json({success: false, message: "missing username-required"});
+  if (!email)
+    return res.status(400).json({success: false, message: "missing email-required"});
+  if (!password)
+    return res.status(400).json({success: false, message: "missing password-required"});
 
 
-    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/; // letters, numbers, underscores, 3-20 chars
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/; // min 8 chars, 1 uppercase, 1 lowercase, 1 number
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/; // letters, numbers, underscores, 3-20 chars
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/; // min 8 chars, 1 uppercase, 1 lowercase, 1 number
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-    if (!usernameRegex.test(username)) {
-      return res.status(400).json({ success: false, message: "invalid username" });
-    }
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: "invalid email"});
-    }
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({ success: false, message: "invalid password" });
-    }
+  if (!usernameRegex.test(username)) {
+    return res.status(400).json({ success: false, message: "invalid username" });
+  }
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ success: false, message: "invalid email"});
+  }
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ success: false, message: "invalid password" });
+  }
 
 
-    const hashed = await bcrypt.hash(password, 10);
-    try {
-      // Check if email or username already exists
-      const existingUser = await db.get(
-        "SELECT username, email FROM users WHERE username = ? OR email = ?",
-        [username, email]
-      );
+  const hashed = await bcrypt.hash(password, 10);
+  try {
+    // Check if email or username already exists
+    const existingUser = await db.get(
+      "SELECT username, email FROM users WHERE username = ? OR email = ?",
+      [username, email]
+    );
 
 
-      if (existingUser) {
-        if (existingUser.username === username) {
-          return res.status(400).json({
-            success: false,
-            message: "exists username",
-          });
-        }
-        if (existingUser.email === email) {
-          return res.status(400).json({
-            success: false,
-            message: "exists email",
-          });
-        }
+    if (existingUser) {
+      if (existingUser.username === username) {
+        return res.status(400).json({
+          success: false,
+          message: "exists username",
+        });
       }
-
-
-      const result = await db.run(
-        "INSERT INTO users (name, username, email, password_hash) VALUES (?, ?, ?, ?)",
-        [name, username, email, hashed]
-      );
-
-
-      req.session.userId = result.lastID; // store user session
-      await req.session.save();
-      // ✅ Send a clear JSON response for the client to detect
-      res.json({ success: true, message: "Account created successfully!" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, message: "Server error" });
+      if (existingUser.email === email) {
+        return res.status(400).json({
+          success: false,
+          message: "exists email",
+        });
+      }
     }
-  });
+
+
+    const result = await db.run(
+      "INSERT INTO users (name, username, email, password_hash) VALUES (?, ?, ?, ?)",
+      [name, username, email, hashed]
+    );
+
+
+    req.session.userId = result.lastID; // store user session
+    await req.session.save();
+    // ✅ Send a clear JSON response for the client to detect
+    res.json({ success: true, message: "Account created successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
 // Check login status
 app.get("/check-login", async (req, res) => {
@@ -554,6 +626,140 @@ app.post("/logout", (req, res) => {
     res.json({ success: true, message: "No session to clear" });
   }
 });
+
+// Middleware to require login
+function requireLogin(req, res, next) {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ success: false, message: "User not logged in" });
+  }
+  next();
+}
+
+// ============================================
+// Put On Routes
+// ============================================
+
+app.post("/api/putons", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ success: false, message: "Not logged in" });
+    }
+
+    const { name, type, brand, color, size, price, image, category, notes, sourceImage } = req.body;
+
+    await db.run(
+      `INSERT INTO putons (user_id, name, type, brand, color, size, price, image, category, notes, source_image, added_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      [req.session.userId, name, type, brand, color, size, price, image, category, notes, sourceImage]
+    );
+
+    res.json({ success: true, message: "Put on added successfully!" });
+  } catch (err) {
+    console.error("Error adding put on:", err);
+    res.status(500).json({ success: false, message: "Database error" });
+  }
+});
+
+// ✅ Get all "Put Ons" for the logged-in user
+app.get("/api/putons", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const putons = await db.all(
+      "SELECT * FROM putons WHERE user_id = ? ORDER BY added_at DESC",
+      [userId]
+    );
+    res.json({ success: true, items: putons });
+  } catch (err) {
+    console.error("❌ Error fetching put on:", err);
+    res.status(500).json({ success: false, message: "Failed to load put ons" });
+  }
+});
+
+// ✅ Delete a put on
+app.delete("/api/putons/:id", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const itemId = req.params.id;
+    const result = await db.run(
+      "DELETE FROM putons WHERE id = ? AND user_id = ?",
+      [itemId, userId]
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    res.json({ success: true, message: "Put on deleted" });
+  } catch (err) {
+    console.error("❌ Error deleting put on:", err);
+    res.status(500).json({ success: false, message: "Failed to delete put on" });
+  }
+});
+
+
+// ============================================
+// WISHLIST ROUTES
+// ============================================
+
+// ✅ Add new wishlist item
+app.post("/api/wishlist", requireLogin, async (req, res) => {
+  try {
+    const { name, type, brand, color, size, price, image, category, notes } = req.body;
+    const userId = req.session.userId;
+
+    if (!name || !type) {
+      return res.status(400).json({ success: false, message: "Missing name or type" });
+    }
+
+    const addedAt = new Date().toISOString();
+
+    const result = await db.run(
+      `INSERT INTO wishlist (user_id, name, type, brand, color, size, price, image, category, notes, addedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [userId, name, type, brand, color, size, price, image, category, notes, addedAt]
+    );
+
+    res.json({
+      success: true,
+      message: "Item added to wishlist!",
+      item: { id: result.lastID, name, type, brand, color, size, price, image, category, notes, addedAt }
+    });
+  } catch (err) {
+    console.error("❌ Error adding wishlist item:", err);
+    res.status(500).json({ success: false, message: "Failed to add wishlist item" });
+  }
+});
+
+// ✅ Get all wishlist items for the logged-in user
+app.get("/api/wishlist", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const items = await db.all("SELECT * FROM wishlist WHERE user_id = ? ORDER BY addedAt DESC", [userId]);
+    res.json({ success: true, items });
+  } catch (err) {
+    console.error("❌ Error fetching wishlist:", err);
+    res.status(500).json({ success: false, message: "Failed to load wishlist" });
+  }
+});
+
+// ✅ Delete a wishlist item
+app.delete("/api/wishlist/:id", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const itemId = req.params.id;
+    const result = await db.run("DELETE FROM wishlist WHERE id = ? AND user_id = ?", [itemId, userId]);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    res.json({ success: true, message: "Item deleted" });
+  } catch (err) {
+    console.error("❌ Error deleting wishlist item:", err);
+    res.status(500).json({ success: false, message: "Failed to delete item" });
+  }
+});
+
 
 
 // ============================================

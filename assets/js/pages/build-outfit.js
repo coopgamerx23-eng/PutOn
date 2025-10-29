@@ -4,40 +4,48 @@ const wardrobeSlots = document.querySelectorAll('.wardrobe-slot');
 let draggedItem = null;
 
 // ========================================
-// LOAD SAVED ITEMS FROM LOCALSTORAGE
+// LOAD SAVED ITEMS FROM DATABASE
 // ========================================
-function loadPutOns() {
+async function loadPutOns() {
     try {
-        const savedItems = JSON.parse(localStorage.getItem('putOns') || '[]');
         const putOnsGrid = document.getElementById('putOns');
-        
-        console.log('🔍 Loading Put-Ons...');
-        console.log('📦 Found items in localStorage:', savedItems.length);
-        console.log('📝 Items data:', savedItems);
-        
-        if (savedItems.length === 0) {
-            console.log('ℹ️ No saved items found');
-            putOnsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">No items yet. Add items from the Explore page!</p>';
+        console.log('🔍 Loading Put-Ons from database...');
+
+        const res = await fetch('http://localhost:3000/api/putons', {
+            method: 'GET',
+            credentials: 'include', // include session cookies
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server error ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log('✅ Loaded from DB:', data);
+
+        if (!data.success || !Array.isArray(data.items) || data.items.length === 0) {
+            putOnsGrid.innerHTML = `
+                <p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                    No items yet. Add items from the Explore page!
+                </p>`;
             return;
         }
-        
-        console.log(`✅ Loading ${savedItems.length} saved items`);
-        
-        // Clear existing sample items
+
+        // Clear grid and add items
         putOnsGrid.innerHTML = '';
-        
-        // Add each saved item
-        savedItems.forEach((item, index) => {
-            console.log(`\n🎨 Creating card ${index + 1}:`, item);
+        data.items.forEach(item => {
             const itemCard = createItemCard(item);
             putOnsGrid.appendChild(itemCard);
         });
-        
-        // Re-initialize drag handlers for new items
+
         initializeDragHandlers();
-        
-    } catch (error) {
-        console.error('❌ Error loading saved items:', error);
+
+    } catch (err) {
+        console.error('❌ Error loading Put-Ons:', err);
+        document.getElementById('putOns').innerHTML = `
+            <p style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                Failed to load Put-Ons. Please try again later.
+            </p>`;
     }
 }
 
@@ -140,28 +148,26 @@ function mapTypeToCategory(type) {
 // ========================================
 // DELETE ITEM
 // ========================================
-function deleteItem(itemId, cardElement) {
-    if (!confirm('Remove this item from Put-Ons?')) {
-        return;
-    }
-    
+async function deleteItem(itemId, cardElement) {
     try {
-        const savedItems = JSON.parse(localStorage.getItem('putOns') || '[]');
-        const updatedItems = savedItems.filter(item => item.id !== itemId);
-        localStorage.setItem('putOns', JSON.stringify(updatedItems));
-        
-        // Remove from DOM with animation
+        const res = await fetch(`http://localhost:3000/api/putons/${itemId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Failed to delete');
+
+        // Animate + remove from DOM
         cardElement.style.transition = 'all 0.3s ease';
         cardElement.style.transform = 'scale(0)';
         cardElement.style.opacity = '0';
-        
-        setTimeout(() => {
-            cardElement.remove();
-        }, 300);
-        
-        console.log('✅ Item deleted');
-    } catch (error) {
-        console.error('❌ Error deleting item:', error);
+        setTimeout(() => cardElement.remove(), 300);
+
+        console.log('✅ Item deleted from database');
+    } catch (err) {
+        console.error('❌ Error deleting item:', err);
+        alert('Failed to delete item.');
     }
 }
 
@@ -171,14 +177,12 @@ function deleteItem(itemId, cardElement) {
 function initializeDragHandlers() {
     const allItemCards = document.querySelectorAll('.item-card');
     
-    allItemCards.forEach(card => {
-        // Remove old listeners by cloning
-        const newCard = card.cloneNode(true);
-        card.parentNode.replaceChild(newCard, card);
-    });
-    
     // Add new listeners
-    document.querySelectorAll('.item-card').forEach(card => {
+    allItemCards.forEach(card => {
+        // Remove existing drag listeners first
+        card.ondragstart = null;
+        card.ondragend = null;
+        
         card.addEventListener('dragstart', (e) => {
             draggedItem = card;
             card.classList.add('dragging');
@@ -193,18 +197,14 @@ function initializeDragHandlers() {
         // Re-attach delete button handler
         const deleteBtn = card.querySelector('.delete-item-btn');
         if (deleteBtn) {
+            // Get the item ID directly from the card's dataset
             const itemId = card.dataset.item;
+            
+            // Remove old onclick and add new one
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
-                // Find the actual item ID from localStorage
-                const savedItems = JSON.parse(localStorage.getItem('putOns') || '[]');
-                const item = savedItems.find(i => 
-                    (i.id && i.id.toString() === itemId) || 
-                    i.name.toLowerCase().replace(/\s+/g, '-') === itemId
-                );
-                if (item) {
-                    deleteItem(item.id, card);
-                }
+                console.log('🗑️ Delete button clicked for item:', itemId);
+                deleteItem(itemId, card);
             };
         }
     });

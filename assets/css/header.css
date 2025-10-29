@@ -81,3 +81,13 @@ nav ul li a:hover {
   padding-top: 6px;
   padding-bottom: 6px;
 }
+
+.incorrect-sign-in-message {
+  display: none;
+  color: red;
+  font-size: 10px;
+}
+
+.incorrect-sign-in-message.visible {
+  display: block;
+}

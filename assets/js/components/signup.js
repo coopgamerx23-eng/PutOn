@@ -4,11 +4,15 @@ export async function initSignup() {
   const html = await response.text();
   document.getElementById('create-account-page-placeholder').innerHTML = html;
 
-  const script = document.createElement("script");
-  script.src = "/assets/js/components/setup-account.js";
-  script.type = "module";
-  document.body.appendChild(script);
+  const signup_script = document.createElement("script");
+  signup_script.src = "/assets/js/components/setup-account.js";
+  signup_script.type = "module";
+  document.body.appendChild(signup_script);
 
+  const signin_script = document.createElement("script");
+  signin_script.src = "/assets/js/components/signin.js";
+  signin_script.type = "module";
+  document.body.appendChild(signin_script);
 
   // Set up signup page
   const createAccountButton = document.querySelector(".create-account");
