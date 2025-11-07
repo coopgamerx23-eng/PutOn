@@ -32,18 +32,10 @@
       </div>
 
       <!-- Search and Filter Bar -->
-      <div class="search-bar">
+      <div class="search-bar liquid-container">
         <div class="search-controls">
-          <div class="search-input-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input
-              type="text"
-              id="search-input"
-              class="search-input"
-              placeholder="Search items..."
-            />
-          </div>
-          <select id="category-filter" class="category-filter">
+          <input id="item-name-input" class="liquid-input" type="text" placeholder="Search wardrobe items...">
+          <select id="category-filter" class="liquid-select">
             <option value="all">All Categories</option>
             <option value="tops">Tops</option>
             <option value="bottoms">Bottoms</option>
@@ -52,7 +44,7 @@
             <option value="shoes">Shoes</option>
             <option value="accessories">Accessories</option>
           </select>
-          <button id="add-item-btn" class="add-item-btn">
+          <button id="add-item-btn" class="liquid-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             Add Item
           </button>

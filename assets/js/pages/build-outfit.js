@@ -315,22 +315,6 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// Debug function - you can call this in the console
-window.debugPutOns = function() {
-    console.log('=== PUT-ONS DEBUG ===');
-    const data = localStorage.getItem('putOns');
-    console.log('Raw data:', data);
-    if (data) {
-        const parsed = JSON.parse(data);
-        console.log('Parsed:', parsed);
-        console.log('Count:', parsed.length);
-        parsed.forEach((item, i) => {
-            console.log(`Item ${i}:`, item.name, 'has image:', !!item.imageData);
-        });
-    }
-    console.log('===================');
-};
-
 // Test function to manually reload
 window.reloadPutOns = function() {
     console.log('🔄 Manually reloading Put-Ons...');

@@ -1,0 +1,53 @@
+Date : 2025-11-06 22:20:43
+Directory : c:\Users\Natha\OneDrive\Documents\PutOn
+Total : 18 files,  3000 codes, 52 comments, 246 blanks, all 3298 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |          8 |      1,163 |         25 |        108 |      1,296 |
+| JSON       |          3 |        962 |          0 |          0 |        962 |
+| PostCSS    |          5 |        799 |         27 |        127 |        953 |
+| HTML       |          2 |         76 |          0 |         11 |         87 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |         18 |      3,000 |         52 |        246 |      3,298 |
+| . (Files)                                                                     |          3 |        493 |         42 |         54 |        589 |
+| assets                                                                        |         12 |      1,605 |         10 |        181 |      1,796 |
+| assets\css                                                                    |          5 |        799 |         27 |        127 |        953 |
+| assets\js                                                                     |          7 |        806 |        -17 |         54 |        843 |
+| assets\js\components                                                          |          2 |        283 |        -43 |         -3 |        237 |
+| assets\js\pages                                                               |          5 |        523 |         26 |         57 |        606 |
+| data                                                                          |          1 |        826 |          0 |          0 |        826 |
+| pages                                                                         |          2 |         76 |          0 |         11 |         87 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                      | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\account-settings.css       | PostCSS    |        103 |          5 |         17 |        125 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\explore.css                | PostCSS    |        165 |          6 |         26 |        197 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\new-post.css               | PostCSS    |        282 |          0 |         53 |        335 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\virtual-wardrobe.css       | PostCSS    |        114 |         11 |         20 |        145 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\wishlist.css               | PostCSS    |        135 |          5 |         11 |        151 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\components\load-user.js     | JavaScript |         31 |          0 |          0 |         31 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\components\scroll-images.js | JavaScript |        252 |        -43 |         -3 |        206 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\build-outfit.js       | JavaScript |        -16 |          0 |          0 |        -16 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\explore-page.js       | JavaScript |        234 |          7 |         14 |        255 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\new-post.js           | JavaScript |        150 |         10 |         21 |        181 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\settings.js           | JavaScript |        122 |          7 |         17 |        146 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\virtual-wardrobe.js   | JavaScript |         33 |          2 |          5 |         40 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\data\images.json                      | JSON       |        826 |          0 |          0 |        826 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\package-lock.json                     | JSON       |        135 |          0 |          0 |        135 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\package.json                          | JSON       |          1 |          0 |          0 |          1 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\new-post.html                   | HTML       |         84 |          0 |         11 |         95 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\virtual-wardrobe.html           | HTML       |         -8 |          0 |          0 |         -8 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\server.js                             | JavaScript |        357 |         42 |         54 |        453 |
+| Total                                                                         |            |      3,000 |         52 |        246 |      3,298 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

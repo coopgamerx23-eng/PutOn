@@ -241,31 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ========================================
-    // STORAGE HELPER FUNCTIONS
-    // ========================================
-    function saveItemToYourPieces(item) {
-        try {
-            const existingItems = JSON.parse(localStorage.getItem('yourPieces') || '[]');
-            
-            const itemToSave = {
-                ...item,
-                id: Date.now() + Math.random(),
-                addedAt: new Date().toISOString(),
-                sourceImage: images[currentIndex]?.src || ''
-            };
-            
-            existingItems.push(itemToSave);
-            localStorage.setItem('yourPieces', JSON.stringify(existingItems));
-            
-            console.log('✅ Item saved to Your Pieces:', itemToSave);
-            return true;
-        } catch (error) {
-            console.error('❌ Error saving item:', error);
-            return false;
-        }
-    }
-
-    // ========================================
     // AI CLOTHING DETECTION FUNCTION
     // ========================================
     async function detectClothing(imageUrl, postData = {}) {
