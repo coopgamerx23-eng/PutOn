@@ -7,7 +7,6 @@ async function safeLoad(fn, name) {
   try {
     await fn();
   } catch (err) {
-    console.warn(`${name} failed to load or not present:`, err.message);
   }
 }
 

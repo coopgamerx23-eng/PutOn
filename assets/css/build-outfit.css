@@ -217,18 +217,6 @@ body {
     font-size: 14px;
 }
 
-.items-grid:empty::after {
-    content: "No items yet. Add items from the Explore page!";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 14px;
-    text-align: center;
-    padding: 20px;
-}
-
 .item-card {
     background: rgba(217, 217, 217, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -290,32 +278,6 @@ body {
     text-align: center;
     position: relative;
     z-index: 1;
-}
-
-/* Upload button with 80s style */
-.upload-btn {
-    padding: 12px 24px;
-    background: #000;
-    color: #fff;
-    border: 4px solid #fff;
-    border-radius: 0;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 6px 6px 0 #f7931e;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.upload-btn:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: 9px 9px 0 #f7931e;
-}
-
-.upload-btn:active {
-    transform: translate(0, 0);
-    box-shadow: 3px 3px 0 #f7931e;
 }
 
 /* Corner PNG decoration for Put-Ons section */

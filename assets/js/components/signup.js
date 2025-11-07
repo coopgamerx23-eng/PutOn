@@ -2,7 +2,9 @@ export async function initSignup() {
   // Insert html
   const response = await fetch('/components/modals/account-set-up.html');
   const html = await response.text();
-  document.getElementById('create-account-page-placeholder').innerHTML = html;
+  try {
+    document.getElementById('create-account-page-placeholder').innerHTML = html;
+  } catch {}
 
   const signup_script = document.createElement("script");
   signup_script.src = "/assets/js/components/setup-account.js";

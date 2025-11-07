@@ -1,297 +1,1255 @@
 [
   {
     "url": "/assets/images/outfits/fyp/friends/fxn_2025-07-08_230212.568.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/fxn_2025-07-08_232121.259.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_0033.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_1686.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_3075.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Fall"
+    ]
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_3656.jpg",
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Fall",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_3905.JPG",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
+  },
+  {
+    "url": "/assets/images/outfits/fyp/friends/IMG_4342.jpg",
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4383.JPG",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4687.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4688.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4689.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4690.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4691.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4692.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Summer",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4693.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4694.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4695.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Old money",
+      "Date night"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4696.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Beach"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4697.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Beach"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4698.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Beach",
+      "Date night"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4699.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Old money"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4700.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Stockholm"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4701.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4702.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Beach"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4705.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Summer",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4706.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Summer",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4708.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Summer",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4709.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4710.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4711.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4713.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Beach",
+      "Comfortable",
+      "Stockholm"
+    ],
+    "Season": [
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4714.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4715.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4716.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Spring",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4717.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4718.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_4731.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Old money"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_6656.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Spring",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_6884.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_7358.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_7361.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/friends/IMG_7392.jpg",
-    "page": "fyp",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Spring",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (10).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear",
+      "Comfortable"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (11).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Old money"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (12).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable",
+      "Streetwear"
+    ],
+    "Season": [
+      "Winter",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (13).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Old money"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (14).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Stockholm"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (15).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (16).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Spring"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (17).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Stockholm",
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (18).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Beach",
+      "Old money"
+    ],
+    "Season": [
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (2).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (3).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear",
+      "Comfortable"
+    ],
+    "Season": [
+      "Summer",
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (4).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (5).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Fall",
+      "Winter"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (6).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Old money"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (7).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Date night",
+      "Beach",
+      "Stockholm"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (8).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Fall"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp (9).jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear",
+      "Comfortable"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   },
   {
     "url": "/assets/images/outfits/fyp/trending/fyp.jpg",
-    "page": "trending",
-    "gender": "male"
+    "caption": "Love this outfit!",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 2,
+    "userName": "John Doe",
+    "page": [
+      "trending"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Streetwear",
+      "Comfortable"
+    ],
+    "Season": [
+      "Winter",
+      "Fall"
+    ]
+  },
+  {
+    "url": "/assets/images/outfits/user-posts/post_1762461346499.jpg",
+    "caption": "Zach Mazer",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 1,
+    "userName": "John Doe",
+    "page": [
+      "fyp"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Comfortable"
+    ],
+    "Season": [
+      "Fall"
+    ]
+  },
+  {
+    "url": "/assets/images/outfits/user-posts/post_1762462149576.jpg",
+    "caption": "Scott Holscher",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "userId": 1,
+    "userName": "John Doe",
+    "page": [
+      "user-posts"
+    ],
+    "Gender": [
+      "Men"
+    ],
+    "Style": [
+      "Stockholm"
+    ],
+    "Season": [
+      "Spring",
+      "Summer"
+    ]
   }
 ]

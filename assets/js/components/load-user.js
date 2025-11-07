@@ -29,10 +29,50 @@ document.addEventListener("base:ready", async() => {
                 userButton.style.transform = 'scale(1.3)';
                 userButton.style.paddingTop = '0';
                 userButton.style.paddingBottom = '0';
-            })
+            });
             userButton.addEventListener("mouseleave", () => {
                 userButton.style.transform = 'scale(1)';
-            })
+            });
+            try {
+                document.querySelector(".profile-name").textContent = data.user.name;
+                document.getElementById("display-name-input").value = data.user.name;
+                document.querySelector(".profile-username").textContent = "@"+data.user.username;
+                document.getElementById("display-username-input").value = data.user.username;
+                document.getElementById("display-email-input").value = data.user.email;
+                document.getElementById("display-bio-input").value = data.user.bio;
+                document.getElementById("display-location-input").value = data.user.location;
+                document.getElementById("display-birthday-input").value = data.user.birthday;
+                document.getElementById("display-shirt-size-input").value = data.user.shirt_size;
+                document.getElementById("display-shoe-size-input").value = data.user.shoe_size;
+                document.getElementById("display-waist-size-input").value = data.user.waist_size;
+                document.getElementById("display-inseam-input").value = data.user.inseam;
+                document.getElementById("display-chest-size-input").value = data.user.chest_size;
+                document.getElementById("display-height-input").value = data.user.height;
+                if (data.user.dark_mode == "true") {
+                    document.getElementById("dark-mode-switch").classList.add("active");
+                } else {
+                    document.getElementById("dark-mode-switch").classList.remove("active");
+                } if (data.user.push_notifications == "true") {
+                    document.getElementById("push-notifications-switch").classList.add("active");
+                } else {
+                    document.getElementById("push-notifications-switch").classList.remove("active");
+                } if (data.user.email_updates == "true") {
+                    document.getElementById("email-updates-switch").classList.add("active");
+                } else {
+                    document.getElementById("email-updates-switch").classList.remove("active");
+                } if (data.user.private_profile == "true") {
+                    document.getElementById("private-profile-switch").classList.add("active");
+                } else {
+                    document.getElementById("private-profile-switch").classList.remove("active");
+                } if (data.user.show_size_recommendations == "true") {
+                    document.getElementById("show-recommendations-switch").classList.add("active");
+                } else {
+                    document.getElementById("show-recommendations-switch").classList.remove("active");
+                }
+                document.getElementById("display-preferred-style-input").value = data.user.preferred_style;
+            } catch {
+                // Nothing
+            }
         } else {
             console.log("Don't welcome back");
         }

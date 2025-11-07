@@ -44,55 +44,56 @@ function initEventListeners() {
   document.getElementById('add-modal').addEventListener('click', (e) => {
     if (e.target.id === 'add-modal') closeModal();
   });
+
+  // Event delegation for delete buttons
+  document.addEventListener('click', (e) => {
+    const deleteBtn = e.target.closest('.delete-btn');
+    if (deleteBtn) {
+      const itemId = deleteBtn.getAttribute('data-item-id');
+      const outfitId = deleteBtn.getAttribute('data-outfit-id');
+      
+      if (itemId) {
+        deleteItem(itemId);
+      } else if (outfitId) {
+        deleteOutfit(outfitId);
+      }
+    }
+  });
 }
 
 // Load items from storage
 async function loadItems() {
   try {
-    const keys = await window.storage.list('wardrobe:');
-    if (keys && keys.keys) {
-      const loadedItems = await Promise.all(
-        keys.keys.map(async (key) => {
-          try {
-            const result = await window.storage.get(key);
-            return result ? JSON.parse(result.value) : null;
-          } catch (error) {
-            console.error(`Error loading item ${key}:`, error);
-            return null;
-          }
-        })
-      );
-      items = loadedItems.filter(item => item !== null);
-      renderCurrentView();
-    }
-  } catch (error) {
-    console.log('No items found yet');
-    items = [];
+    const res = await fetch('http://localhost:3000/api/wardrobe', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    items = data.items || [];
     renderCurrentView();
+    console.log('✅ Loaded wardrobe items from database:', items.length);
+  } catch (err) {
+    console.error('❌ Error loading wardrobe items:', err);
   }
 }
 
-// Load outfits from storage
+// Load outfits from the database
 async function loadOutfits() {
   try {
-    const keys = await window.storage.list('outfit:');
-    if (keys && keys.keys) {
-      const loadedOutfits = await Promise.all(
-        keys.keys.map(async (key) => {
-          try {
-            const result = await window.storage.get(key);
-            return result ? JSON.parse(result.value) : null;
-          } catch (error) {
-            console.error(`Error loading outfit ${key}:`, error);
-            return null;
-          }
-        })
-      );
-      outfits = loadedOutfits.filter(outfit => outfit !== null);
-      renderCurrentView();
-    }
+    const res = await fetch('http://localhost:3000/api/outfits', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    outfits = data.outfits || [];
+    renderCurrentView();
+    console.log('✅ Loaded outfits from database:', outfits.length);
   } catch (error) {
-    console.log('No outfits found yet');
+    console.error('❌ Error loading outfits:', error);
     outfits = [];
     renderCurrentView();
   }
@@ -109,18 +110,14 @@ function switchView(view) {
   const searchInput = document.getElementById('search-input');
   
   if (view === 'items') {
-    itemsBtn.classList.add('bg-purple-600', 'text-white');
-    itemsBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
-    outfitsBtn.classList.remove('bg-purple-600', 'text-white');
-    outfitsBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+    itemsBtn.classList.add('active');
+    outfitsBtn.classList.remove('active');
     categoryFilter.classList.remove('hidden');
     addItemBtn.classList.remove('hidden');
     searchInput.placeholder = 'Search items...';
   } else {
-    outfitsBtn.classList.add('bg-purple-600', 'text-white');
-    outfitsBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
-    itemsBtn.classList.remove('bg-purple-600', 'text-white');
-    itemsBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+    outfitsBtn.classList.add('active');
+    itemsBtn.classList.remove('active');
     categoryFilter.classList.add('hidden');
     addItemBtn.classList.add('hidden');
     searchInput.placeholder = 'Search outfits...';
@@ -165,16 +162,16 @@ function renderItems() {
   } else {
     emptyState.classList.add('hidden');
     itemsView.innerHTML = filteredItems.map(item => `
-      <div class="bg-white rounded-lg shadow-md overflow-hidden group relative">
-        <div class="aspect-square bg-gray-100 relative">
-          <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" />
-          <button onclick="deleteItem('${item.id}')" class="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+      <div class="item-card">
+        <div class="item-image-wrapper">
+          <img src="${item.image}" alt="${item.name}" class="item-image" />
+          <button class="delete-btn" data-item-id="${item.id}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
-        <div class="p-3">
-          <p class="font-medium text-gray-800 truncate">${item.name}</p>
-          <p class="text-sm text-gray-500 capitalize">${item.category}</p>
+        <div class="item-info">
+          <p class="item-name">${item.name}</p>
+          <p class="item-category">${item.category}</p>
         </div>
       </div>
     `).join('');
@@ -205,23 +202,23 @@ function renderOutfits() {
   } else {
     emptyState.classList.add('hidden');
     outfitsView.innerHTML = filteredOutfits.map(outfit => `
-      <div class="bg-white rounded-lg shadow-md overflow-hidden group">
-        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h3 class="font-semibold text-lg text-gray-800">${outfit.name}</h3>
-          <button onclick="deleteOutfit('${outfit.id}')" class="bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+      <div class="outfit-card">
+        <div class="outfit-header">
+          <h3 class="outfit-name">${outfit.name}</h3>
+          <button class="delete-btn" data-outfit-id="${outfit.id}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
-        <div class="p-4">
-          <div class="grid grid-cols-2 gap-3">
+        <div class="outfit-body">
+          <div class="outfit-items-grid">
             ${outfit.items && outfit.items.length > 0 ? outfit.items.map(item => `
-              <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" />
+              <div class="outfit-item">
+                <img src="${item.image}" alt="${item.name}" />
               </div>
-            `).join('') : '<p class="text-gray-400 col-span-2">No items in this outfit</p>'}
+            `).join('') : '<p class="outfit-empty">No items in this outfit</p>'}
           </div>
           ${outfit.items && outfit.items.length > 0 ? `
-            <p class="text-sm text-gray-500 mt-3">
+            <p class="outfit-count">
               ${outfit.items.length} ${outfit.items.length === 1 ? 'item' : 'items'}
             </p>
           ` : ''}
@@ -261,17 +258,13 @@ function switchAddMethod(method) {
   const urlInput = document.getElementById('url-input');
   
   if (method === 'upload') {
-    uploadTab.classList.add('bg-purple-600', 'text-white');
-    uploadTab.classList.remove('bg-gray-100', 'text-gray-700');
-    urlTab.classList.remove('bg-purple-600', 'text-white');
-    urlTab.classList.add('bg-gray-100', 'text-gray-700');
+    uploadTab.classList.add('active');
+    urlTab.classList.remove('active');
     uploadInput.classList.remove('hidden');
     urlInput.classList.add('hidden');
   } else {
-    urlTab.classList.add('bg-purple-600', 'text-white');
-    urlTab.classList.remove('bg-gray-100', 'text-gray-700');
-    uploadTab.classList.remove('bg-purple-600', 'text-white');
-    uploadTab.classList.add('bg-gray-100', 'text-gray-700');
+    urlTab.classList.add('active');
+    uploadTab.classList.remove('active');
     urlInput.classList.remove('hidden');
     uploadInput.classList.add('hidden');
   }
@@ -281,13 +274,50 @@ function switchAddMethod(method) {
 function handleFileChange(e) {
   const file = e.target.files[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      imagePreview = reader.result;
+    resizeImage(file, 800, 800, 0.8).then(resizedImage => {
+      imagePreview = resizedImage;
       showImagePreview(imagePreview);
+    });
+  }
+}
+
+// Resize image to max dimensions and compress
+function resizeImage(file, maxWidth, maxHeight, quality) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > maxWidth) {
+            height = height * (maxWidth / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = width * (maxHeight / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to base64 with compression
+        const resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(resizedDataUrl);
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
-  }
+  });
 }
 
 // Handle URL input
@@ -310,59 +340,79 @@ function showImagePreview(src) {
 async function addItem() {
   const itemName = document.getElementById('item-name-input').value.trim();
   const category = document.getElementById('category-input').value;
-  
+
   if (!itemName || !imagePreview) {
     alert('Please provide an item name and image');
     return;
   }
-  
+
   const newItem = {
-    id: Date.now().toString(),
     name: itemName,
-    image: imagePreview,
     category: category,
-    addedDate: new Date().toISOString()
+    image: imagePreview
   };
-  
+
   try {
-    await window.storage.set(`wardrobe:${newItem.id}`, JSON.stringify(newItem));
-    items.push(newItem);
+    const res = await fetch('http://localhost:3000/api/wardrobe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(newItem)
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
+    items.push(data.item);
     renderCurrentView();
     closeModal();
+    console.log('✅ Saved item to database:', data.item);
   } catch (error) {
-    console.error('Error saving item:', error);
-    alert('Failed to save item');
+    console.error('❌ Error saving item:', error);
+    alert('Failed to save item.');
   }
 }
 
 // Delete item
 async function deleteItem(id) {
   if (!confirm('Are you sure you want to delete this item?')) return;
-  
+
   try {
-    await window.storage.delete(`wardrobe:${id}`);
+    const res = await fetch(`http://localhost:3000/api/wardrobe/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
     items = items.filter(item => item.id !== id);
     renderCurrentView();
+    console.log('🗑️ Deleted item from database:', id);
   } catch (error) {
-    console.error('Error deleting item:', error);
-    alert('Failed to delete item');
+    console.error('❌ Error deleting item:', error);
+    alert('Failed to delete item.');
   }
 }
 
 // Delete outfit
 async function deleteOutfit(id) {
   if (!confirm('Are you sure you want to delete this outfit?')) return;
-  
+
   try {
-    await window.storage.delete(`outfit:${id}`);
+    const res = await fetch(`http://localhost:3000/api/outfits/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+
     outfits = outfits.filter(outfit => outfit.id !== id);
     renderCurrentView();
+    console.log('🗑️ Deleted outfit from database:', id);
   } catch (error) {
-    console.error('Error deleting outfit:', error);
-    alert('Failed to delete outfit');
+    console.error('❌ Error deleting outfit:', error);
+    alert('Failed to delete outfit.');
   }
 }
-
-// Make functions globally accessible
-window.deleteItem = deleteItem;
-window.deleteOutfit = deleteOutfit;

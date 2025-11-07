@@ -7,14 +7,28 @@ function shuffleArray(array) {
     return shuffled;
 }
 
-export default async function loadImages(filterPage = null) {
+export default async function loadImages(selectedFilters = {}) {
     const response = await fetch("/data/images.json");
     let images = await response.json();
 
     // If the JSON is an array of objects, not strings
     if (images.length && typeof images[0] !== "string") {
-        if (filterPage) {
-            images = images.filter(img => img.page === filterPage);
+        if (Object.keys(selectedFilters).length > 0) {
+        images = images.filter(img => {
+            // For every category in selectedFilters
+            return Object.entries(selectedFilters).every(([category, subCategories]) => {
+                // Only keep the image if img[category] exists and matches at least one selected subcategory
+                if (!img[category]) return false;
+
+                // If img[category] is an array, check if any selected subcategory is included
+                if (Array.isArray(img[category])) {
+                    return subCategories.some(sub => img[category].includes(sub));
+                } else {
+                    // If it's a single string, check if it matches one of the selected subcategories
+                    return subCategories.includes(img[category]);
+                }
+            });
+        });
         }
 
         images = shuffleArray(images);
@@ -28,8 +42,15 @@ export default async function loadImages(filterPage = null) {
     if (images.length === 0) {
         gallery.classList.add("no-images");
         const message = document.createElement("p");
-        if (filterPage === "friends") message.textContent = "You currently have no friends added.";
-        if (filterPage == "following") message.textContent = "You are not currently following any creators.";
+
+        if (selectedFilters["friends"]?.length) {
+            message.textContent = "You currently have no friends added.";
+        } else if (selectedFilters["following"]?.length) {
+            message.textContent = "You are not currently following any creators.";
+        } else {
+            message.textContent = "No images match the selected filters.";
+        }
+
         message.classList.add("no-medium-message");
         gallery.appendChild(message);
         return []; // stop here so nothing else runs

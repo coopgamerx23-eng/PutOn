@@ -23,7 +23,7 @@ export const hideDropdownWithDelay = () => {
 export function initDropdown() {
   userButton = document.getElementById('header-user-button');
   dropdown = document.querySelector('.dropdown-menu');
-  const userIcons = document.querySelectorAll('.search-button, .support-button, .region-button');
+  const userIcons = document.querySelectorAll('.add-friend-button, .support-button, .region-button');
 
   if (!userButton || !dropdown) return; // if header not loaded yet
 

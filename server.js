@@ -10,6 +10,40 @@ import cors from "cors";
 import axios from "axios";
 import dotenv from "dotenv";
 import SQLiteStore from "connect-sqlite3";
+import multer from 'multer';
+import fs from 'fs/promises';
+
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(ROOT, 'assets/images/outfits/user-posts');
+    try {
+      await fs.mkdir(uploadDir, { recursive: true });
+      cb(null, uploadDir);
+    } catch (error) {
+      cb(error);
+    }
+  },
+  filename: (req, file, cb) => {
+    // Generate unique filename
+    const timestamp = Date.now();
+    const ext = path.extname(file.originalname);
+    cb(null, `post_${timestamp}${ext}`);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images are allowed'));
+    }
+  }
+});
 
 
 const SQLiteStoreSession = SQLiteStore(session);
@@ -53,7 +87,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true , limit: '10mb'}));
 app.use(express.json());
 app.use(
   session({
@@ -224,6 +259,21 @@ let db;
         name TEXT,
         username TEXT UNIQUE,
         email TEXT UNIQUE,
+        bio TEXT,
+        location TEXT,
+        birthday TEXT,
+        shirt_size TEXT,
+        waist_size TEXT,
+        chest_size TEXT,
+        shoe_size TEXT,
+        inseam TEXT,
+        height TEXT,
+        dark_mode TEXT,
+        push_notifications TEXT,
+        email_updates TEXT,
+        private_profile TEXT,
+        show_size_recommendations TEXT,
+        preferred_style TEXT,
         password_hash TEXT
       );
     `);
@@ -247,23 +297,88 @@ let db;
     `);
 
     await db.exec(`
-    CREATE TABLE IF NOT EXISTS putons (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      name TEXT,
-      type TEXT,
-      brand TEXT,
-      color TEXT,
-      size TEXT,
-      price TEXT,
-      image TEXT,
-      category TEXT,
-      notes TEXT,
-      source_image TEXT,
-      added_at TEXT
-    );
+      CREATE TABLE IF NOT EXISTS putons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        name TEXT,
+        type TEXT,
+        brand TEXT,
+        color TEXT,
+        size TEXT,
+        price TEXT,
+        image TEXT,
+        category TEXT,
+        notes TEXT,
+        source_image TEXT,
+        added_at TEXT
+      );
     `);
 
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS wardrobe (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        name TEXT,
+        category TEXT,
+        image TEXT,
+        addedDate TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS outfits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        name TEXT NOT NULL,
+        description TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS outfit_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        outfit_id INTEGER,
+        item_id INTEGER,
+        FOREIGN KEY (outfit_id) REFERENCES outfits(id) ON DELETE CASCADE,
+        FOREIGN KEY (item_id) REFERENCES wardrobe(id)
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS post_likes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        post_url TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(user_id, post_url)
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS post_reposts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        post_url TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(user_id, post_url)
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS post_saves (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        post_url TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(user_id, post_url)
+      );
+    `);
 
     console.log('✅ Database initialized');
 
@@ -458,6 +573,350 @@ app.post('/api/detect-clothing', async (req, res) => {
   }
 });
 
+// ============================================
+// POST INTERACTION ROUTES
+// ============================================
+
+// Like/Unlike a post
+app.post('/api/posts/like', requireLogin, async (req, res) => {
+  try {
+    const { postUrl, action } = req.body;
+    const userId = req.session.userId;
+
+    if (!postUrl) {
+      return res.status(400).json({ success: false, message: 'Post URL required' });
+    }
+
+    if (action === 'like') {
+      // Add like (ignore if already exists)
+      await db.run(
+        'INSERT OR IGNORE INTO post_likes (user_id, post_url) VALUES (?, ?)',
+        [userId, postUrl]
+      );
+    } else if (action === 'unlike') {
+      // Remove like
+      await db.run(
+        'DELETE FROM post_likes WHERE user_id = ? AND post_url = ?',
+        [userId, postUrl]
+      );
+    }
+
+    // Get updated like count
+    const result = await db.get(
+      'SELECT COUNT(*) as count FROM post_likes WHERE post_url = ?',
+      [postUrl]
+    );
+
+    res.json({ 
+      success: true, 
+      likes: result.count,
+      isLiked: action === 'like'
+    });
+  } catch (error) {
+    console.error('Error toggling like:', error);
+    res.status(500).json({ success: false, message: 'Failed to update like' });
+  }
+});
+
+// Repost/Unrepost a post
+app.post('/api/posts/repost', requireLogin, async (req, res) => {
+  try {
+    const { postUrl, action } = req.body;
+    const userId = req.session.userId;
+
+    if (!postUrl) {
+      return res.status(400).json({ success: false, message: 'Post URL required' });
+    }
+
+    if (action === 'repost') {
+      // Add repost
+      await db.run(
+        'INSERT OR IGNORE INTO post_reposts (user_id, post_url) VALUES (?, ?)',
+        [userId, postUrl]
+      );
+    } else if (action === 'unrepost') {
+      // Remove repost
+      await db.run(
+        'DELETE FROM post_reposts WHERE user_id = ? AND post_url = ?',
+        [userId, postUrl]
+      );
+    }
+
+    // Get updated repost count
+    const result = await db.get(
+      'SELECT COUNT(*) as count FROM post_reposts WHERE post_url = ?',
+      [postUrl]
+    );
+
+    res.json({ 
+      success: true, 
+      reposts: result.count,
+      isReposted: action === 'repost'
+    });
+  } catch (error) {
+    console.error('Error toggling repost:', error);
+    res.status(500).json({ success: false, message: 'Failed to update repost' });
+  }
+});
+
+// Save/Unsave a post
+app.post('/api/posts/save', requireLogin, async (req, res) => {
+  try {
+    const { postUrl, action } = req.body;
+    const userId = req.session.userId;
+
+    if (!postUrl) {
+      return res.status(400).json({ success: false, message: 'Post URL required' });
+    }
+
+    if (action === 'save') {
+      // Add save
+      await db.run(
+        'INSERT OR IGNORE INTO post_saves (user_id, post_url) VALUES (?, ?)',
+        [userId, postUrl]
+      );
+    } else if (action === 'unsave') {
+      // Remove save
+      await db.run(
+        'DELETE FROM post_saves WHERE user_id = ? AND post_url = ?',
+        [userId, postUrl]
+      );
+    }
+
+    // Get updated save count
+    const result = await db.get(
+      'SELECT COUNT(*) as count FROM post_saves WHERE post_url = ?',
+      [postUrl]
+    );
+
+    res.json({ 
+      success: true, 
+      saves: result.count,
+      isSaved: action === 'save'
+    });
+  } catch (error) {
+    console.error('Error toggling save:', error);
+    res.status(500).json({ success: false, message: 'Failed to update save' });
+  }
+});
+
+// Get user's interaction state for a post
+app.get('/api/posts/interactions/:postUrl', requireLogin, async (req, res) => {
+  try {
+    const postUrl = decodeURIComponent(req.params.postUrl);
+    const userId = req.session.userId;
+
+    const [liked, reposted, saved, likesCount, repostsCount, savesCount] = await Promise.all([
+      db.get('SELECT id FROM post_likes WHERE user_id = ? AND post_url = ?', [userId, postUrl]),
+      db.get('SELECT id FROM post_reposts WHERE user_id = ? AND post_url = ?', [userId, postUrl]),
+      db.get('SELECT id FROM post_saves WHERE user_id = ? AND post_url = ?', [userId, postUrl]),
+      db.get('SELECT COUNT(*) as count FROM post_likes WHERE post_url = ?', [postUrl]),
+      db.get('SELECT COUNT(*) as count FROM post_reposts WHERE post_url = ?', [postUrl]),
+      db.get('SELECT COUNT(*) as count FROM post_saves WHERE post_url = ?', [postUrl])
+    ]);
+
+    res.json({
+      success: true,
+      isLiked: !!liked,
+      isReposted: !!reposted,
+      isSaved: !!saved,
+      likes: likesCount.count,
+      reposts: repostsCount.count,
+      saves: savesCount.count
+    });
+  } catch (error) {
+    console.error('Error getting interactions:', error);
+    res.status(500).json({ success: false, message: 'Failed to get interactions' });
+  }
+});
+
+// Get user's liked posts
+app.get('/api/posts/liked', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const liked = await db.all(
+      'SELECT post_url, created_at FROM post_likes WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+
+    res.json({ success: true, posts: liked });
+  } catch (error) {
+    console.error('Error fetching liked posts:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch liked posts' });
+  }
+});
+
+// Get user's saved posts
+app.get('/api/posts/saved', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const saved = await db.all(
+      'SELECT post_url, created_at FROM post_saves WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+
+    res.json({ success: true, posts: saved });
+  } catch (error) {
+    console.error('Error fetching saved posts:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch saved posts' });
+  }
+});
+
+// Get user's reposted posts
+app.get('/api/posts/reposted', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const reposted = await db.all(
+      'SELECT post_url, created_at FROM post_reposts WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+
+    res.json({ success: true, posts: reposted });
+  } catch (error) {
+    console.error('Error fetching reposted posts:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch reposted posts' });
+  }
+});
+
+// ============================================
+// POST CREATION ROUTES
+// ============================================
+
+// Create new post
+app.post('/api/posts', requireLogin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image uploaded' });
+    }
+
+    const { caption, gender, style, season } = req.body;
+    
+    // Parse JSON strings back to arrays
+    const genderTags = gender ? JSON.parse(gender) : [];
+    const styleTags = style ? JSON.parse(style) : [];
+    const seasonTags = season ? JSON.parse(season) : [];
+
+    // Create relative path for the image
+    const imageUrl = `/assets/images/outfits/user-posts/${req.file.filename}`;
+
+    // Read existing images.json
+    const imagesJsonPath = path.join(DATA, 'images.json');
+    let imagesData = [];
+    
+    try {
+      const fileContent = await fs.readFile(imagesJsonPath, 'utf-8');
+      imagesData = JSON.parse(fileContent);
+    } catch (error) {
+      console.log('Creating new images.json file');
+      imagesData = [];
+    }
+
+    // Create new image entry
+    const newEntry = {
+      url: imageUrl,
+      page: ["user-posts"],
+      Gender: genderTags,
+      Style: styleTags,
+      Season: seasonTags,
+      caption: caption || '',
+      userId: req.session.userId,
+      timestamp: new Date().toISOString()
+    };
+
+    // Add to array
+    imagesData.push(newEntry);
+
+    // Write back to file
+    await fs.writeFile(imagesJsonPath, JSON.stringify(imagesData, null, 2));
+
+    res.json({
+      success: true,
+      message: 'Post created successfully!',
+      post: newEntry
+    });
+
+  } catch (error) {
+    console.error('❌ Error creating post:', error);
+    
+    // Clean up uploaded file if there was an error
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting file:', unlinkError);
+      }
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to create post: ' + error.message 
+    });
+  }
+});
+
+// Get user's posts
+app.get('/api/posts', requireLogin, async (req, res) => {
+  try {
+    const imagesJsonPath = path.join(DATA, 'images.json');
+    const fileContent = await fs.readFile(imagesJsonPath, 'utf-8');
+    const imagesData = JSON.parse(fileContent);
+
+    // Filter posts by current user
+    const userPosts = imagesData.filter(img => img.userId === req.session.userId);
+
+    res.json({
+      success: true,
+      posts: userPosts
+    });
+  } catch (error) {
+    console.error('❌ Error fetching posts:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch posts' });
+  }
+});
+
+// Delete a post
+app.delete('/api/posts/:filename', requireLogin, async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    const userId = req.session.userId;
+
+    // Read images.json
+    const imagesJsonPath = path.join(DATA, 'images.json');
+    const fileContent = await fs.readFile(imagesJsonPath, 'utf-8');
+    let imagesData = JSON.parse(fileContent);
+
+    // Find the post
+    const postIndex = imagesData.findIndex(
+      img => img.url.includes(filename) && img.userId === userId
+    );
+
+    if (postIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Post not found' });
+    }
+
+    const post = imagesData[postIndex];
+
+    // Delete the image file
+    const imagePath = path.join(ROOT, post.url);
+    try {
+      await fs.unlink(imagePath);
+    } catch (error) {
+      console.warn('Could not delete image file:', error);
+    }
+
+    // Remove from array
+    imagesData.splice(postIndex, 1);
+
+    // Write back to file
+    await fs.writeFile(imagesJsonPath, JSON.stringify(imagesData, null, 2));
+
+    res.json({ success: true, message: 'Post deleted successfully' });
+  } catch (error) {
+    console.error('❌ Error deleting post:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete post' });
+  }
+});
+
 
 // ============================================
 // AUTHENTICATION ROUTES
@@ -561,8 +1020,8 @@ app.post("/signup", async (req, res) => {
 
 
     const result = await db.run(
-      "INSERT INTO users (name, username, email, password_hash) VALUES (?, ?, ?, ?)",
-      [name, username, email, hashed]
+      "INSERT INTO users (name, username, email, bio, location, birthday, shirt_size, waist_size, chest_size, shoe_size, inseam, height, dark_mode, push_notifications, email_updates, private_profile, show_size_recommendations, preferred_style, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [name, username, email, "", "", "", "", "", "", "", "", "", "false", "false", "false", "false", "false", "", hashed]
     );
 
 
@@ -586,7 +1045,9 @@ app.get("/check-login", async (req, res) => {
 
 
     // Retrieve user info from database
-    const user = await db.get("SELECT username, email FROM users WHERE id = ?", [req.session.userId]);
+    const user = await db.get("SELECT name, username, email, bio, location, birthday, shirt_size, waist_size, chest_size, " + 
+      "shoe_size, inseam, height, dark_mode, push_notifications, email_updates, private_profile, show_size_recommendations, " + 
+      "preferred_style FROM users WHERE id = ?", [req.session.userId]);
 
 
     if (!user) {
@@ -602,6 +1063,22 @@ app.get("/check-login", async (req, res) => {
       user: {
         username: user.username,
         email: user.email,
+        name: user.name,
+        bio: user.bio,
+        location: user.location,
+        birthday: user.birthday,
+        shirt_size: user.shirt_size,
+        waist_size: user.waist_size,
+        chest_size: user.chest_size,
+        shoe_size: user.shoe_size,
+        inseam: user.inseam,
+        height: user.height,
+        dark_mode: user.dark_mode,
+        push_notifications: user.push_notifications,
+        email_updates: user.email_updates,
+        private_profile: user.private_profile,
+        show_size_recommendations: user.show_size_recommendations,
+        preferred_style: user.preferred_style
       },
     });
   } catch (err) {
@@ -634,6 +1111,44 @@ function requireLogin(req, res, next) {
   }
   next();
 }
+
+app.put("/update-user", async (req, res) => {
+  try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ success: false, message: "Not logged in" });
+    }
+
+    const { // Basic info
+        name, username, email, bio, location, birthday, 
+        // Measurements
+        shirt_size, waist_size, chest_size, shoe_size, inseam, height, 
+        // Preferences
+        dark_mode, push_notifications, email_updates, private_profile, 
+        show_size_recommendations, preferred_style } = req.body;
+
+    if (!name || !username ) {
+      return res.status(400).json({ success: false, message: "Missing fields" });
+    }
+
+    await db.run(
+      "UPDATE users SET name = ?, username = ?, email = ?, bio = ?, location = ?, birthday = ?, shirt_size = ?, " + 
+      "waist_size = ?, chest_size = ?, shoe_size = ?, inseam = ?, height = ?, dark_mode = ?, push_notifications = ?, " + 
+      "email_updates = ?, private_profile = ?, show_size_recommendations = ?, preferred_style = ? WHERE id = ?",
+      [
+        name, username, email, bio, location, birthday, shirt_size, 
+        waist_size, chest_size, shoe_size, inseam, height, dark_mode, 
+        push_notifications, email_updates, private_profile, 
+        show_size_recommendations, preferred_style, req.session.userId
+      ]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 // ============================================
 // Put On Routes
@@ -760,7 +1275,100 @@ app.delete("/api/wishlist/:id", requireLogin, async (req, res) => {
   }
 });
 
+// ========================================
+// ✅ Wardrobe Routes
+// ========================================
 
+// Add new item
+app.post("/api/wardrobe", requireLogin, async (req, res) => {
+  try {
+    const { name, category, image } = req.body;
+    const userId = req.session.userId;
+
+    if (!name || !image || !category) {
+      return res.status(400).json({ success: false, message: "Missing name, category, or image" });
+    }
+
+    const addedDate = new Date().toISOString();
+
+    const result = await db.run(
+      `INSERT INTO wardrobe (user_id, name, category, image, addedDate)
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, name, category, image, addedDate]
+    );
+
+    res.json({
+      success: true,
+      message: "Item added to wardrobe!",
+      item: { id: result.lastID, name, category, image, addedDate }
+    });
+  } catch (err) {
+    console.error("❌ Error adding wardrobe item:", err);
+    res.status(500).json({ success: false, message: "Failed to add wardrobe item" });
+  }
+});
+
+// Get all wardrobe items for logged-in user
+app.get("/api/wardrobe", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const items = await db.all(
+      "SELECT * FROM wardrobe WHERE user_id = ? ORDER BY addedDate DESC",
+      [userId]
+    );
+    res.json({ success: true, items });
+  } catch (err) {
+    console.error("❌ Error fetching wardrobe:", err);
+    res.status(500).json({ success: false, message: "Failed to load wardrobe items" });
+  }
+});
+
+// Delete wardrobe item
+app.delete("/api/wardrobe/:id", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const itemId = req.params.id;
+    const result = await db.run(
+      "DELETE FROM wardrobe WHERE id = ? AND user_id = ?",
+      [itemId, userId]
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    res.json({ success: true, message: "Item deleted" });
+  } catch (err) {
+    console.error("❌ Error deleting wardrobe item:", err);
+    res.status(500).json({ success: false, message: "Failed to delete wardrobe item" });
+  }
+});
+
+// Get all outfits
+app.get('/api/outfits', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const outfits = await db.all(
+      'SELECT * FROM outfits WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+    res.json({ success: true, outfits });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
+
+// Delete an outfit
+app.delete('/api/outfits/:id', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const outfitId = req.params.id;
+    await db.run('DELETE FROM outfits WHERE id = ? AND user_id = ?', [outfitId, userId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
 
 // ============================================
 // START SERVER

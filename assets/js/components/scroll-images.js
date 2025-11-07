@@ -11,27 +11,250 @@ document.addEventListener("DOMContentLoaded", () => {
     let isScrolling = false;
     let reel = null;
     let currentItems = []; // Store current detected items
+    let imagesData = []; // Store full image data from JSON
+
+    // ========================================
+    // POST INFO FUNCTIONS
+    // ========================================
+    
+    // Format date to readable string
+    function formatPostDate(dateString) {
+        if (!dateString) return 'Recently';
+        
+        const postDate = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - postDate;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        
+        return postDate.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+    }
+
+    // Create post info overlay HTML (for left side over image)
+    function createPostInfoOverlay(postData, interactionData = {}) {
+        const { 
+            caption = '', 
+            timestamp = '', 
+            userId = null,
+            userName = 'Anonymous User',
+            Gender = [], 
+            Style = [], 
+            Season = []
+        } = postData;
+        
+        const {
+            likes = 0,
+            reposts = 0,
+            saves = 0,
+            isLiked = false,
+            isReposted = false,
+            isSaved = false
+        } = interactionData;
+        
+        // Create tags HTML
+        let tagsHTML = '';
+        if (Gender && Gender.length > 0) {
+            tagsHTML += Gender.map(tag => `<span class="post-tag-overlay gender">${tag}</span>`).join('');
+        }
+        if (Style && Style.length > 0) {
+            tagsHTML += Style.map(tag => `<span class="post-tag-overlay style">${tag}</span>`).join('');
+        }
+        if (Season && Season.length > 0) {
+            tagsHTML += Season.map(tag => `<span class="post-tag-overlay season">${tag}</span>`).join('');
+        }
+        
+        return `
+            <div class="post-info-overlay" id="postInfoOverlay">
+                <button class="post-info-toggle" onclick="togglePostInfo()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                
+                <div class="post-header-overlay">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=2a7f62&color=fff" 
+                         alt="${userName}" 
+                         class="post-author-avatar-overlay">
+                    <div class="post-author-info-overlay">
+                        <h3 class="post-author-name-overlay">${userName}</h3>
+                        <p class="post-date-overlay">${formatPostDate(timestamp)}</p>
+                    </div>
+                </div>
+                
+                ${caption ? `<p class="post-caption-overlay">${caption}</p>` : ''}
+                
+                ${tagsHTML ? `<div class="post-tags-overlay">${tagsHTML}</div>` : ''}
+                
+                <div class="post-interactions-overlay">
+                    <button class="interaction-btn-overlay ${isLiked ? 'liked' : ''}" 
+                            onclick="toggleLike('${postData.url}', this)">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        <span class="interaction-count-overlay">${likes}</span>
+                    </button>
+                    
+                    <button class="interaction-btn-overlay ${isReposted ? 'reposted' : ''}" 
+                            onclick="toggleRepost('${postData.url}', this)">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 1l4 4-4 4"/>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                            <path d="M7 23l-4-4 4-4"/>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                        </svg>
+                        <span class="interaction-count-overlay">${reposts}</span>
+                    </button>
+                    
+                    <button class="interaction-btn-overlay ${isSaved ? 'saved' : ''}" 
+                            onclick="toggleSave('${postData.url}', this)">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span class="interaction-count-overlay">${saves}</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Toggle post info collapse/expand
+    window.togglePostInfo = function() {
+        const overlay = document.getElementById('postInfoOverlay');
+        if (overlay) {
+            overlay.classList.toggle('collapsed');
+        }
+    };
+
+    // Toggle like
+    window.toggleLike = async function(postUrl, button) {
+        try {
+            const isLiked = button.classList.contains('liked');
+            const action = isLiked ? 'unlike' : 'like';
+            
+            const response = await fetch('/api/posts/like', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ postUrl, action })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                button.classList.toggle('liked');
+                
+                // Update count in overlay
+                const countSpan = button.querySelector('.interaction-count-overlay');
+                if (countSpan) {
+                    countSpan.textContent = data.likes;
+                }
+                
+                // Animation
+                if (!isLiked) {
+                    button.style.transform = 'scale(1.15) translateY(-2px)';
+                    setTimeout(() => {
+                        button.style.transform = '';
+                    }, 200);
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            showNotification('Please log in to like posts', 'error');
+        }
+    };
+
+    // Toggle repost
+    window.toggleRepost = async function(postUrl, button) {
+        try {
+            const isReposted = button.classList.contains('reposted');
+            
+            if (!isReposted && !confirm('Repost this to your profile?')) return;
+            
+            const action = isReposted ? 'unrepost' : 'repost';
+            
+            const response = await fetch('/api/posts/repost', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ postUrl, action })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                button.classList.toggle('reposted');
+                
+                // Update count in overlay
+                const countSpan = button.querySelector('.interaction-count-overlay');
+                if (countSpan) {
+                    countSpan.textContent = data.reposts;
+                }
+                
+                showNotification(isReposted ? 'Removed from reposts' : 'Reposted!');
+            }
+        } catch (error) {
+            console.error('Error toggling repost:', error);
+            showNotification('Please log in to repost', 'error');
+        }
+    };
+
+    // Toggle save
+    window.toggleSave = async function(postUrl, button) {
+        try {
+            const isSaved = button.classList.contains('saved');
+            const action = isSaved ? 'unsave' : 'save';
+            
+            const response = await fetch('/api/posts/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ postUrl, action })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                button.classList.toggle('saved');
+                
+                // Update count in overlay
+                const countSpan = button.querySelector('.interaction-count-overlay');
+                if (countSpan) {
+                    countSpan.textContent = data.saves;
+                }
+                
+                showNotification(isSaved ? 'Removed from saved' : 'Saved!');
+            }
+        } catch (error) {
+            console.error('Error toggling save:', error);
+            showNotification('Please log in to save posts', 'error');
+        }
+    };
 
     // ========================================
     // STORAGE HELPER FUNCTIONS
     // ========================================
     function saveItemToYourPieces(item) {
         try {
-            // Get existing items from localStorage
             const existingItems = JSON.parse(localStorage.getItem('yourPieces') || '[]');
             
-            // Add unique ID and timestamp
             const itemToSave = {
                 ...item,
-                id: Date.now() + Math.random(), // Unique ID
+                id: Date.now() + Math.random(),
                 addedAt: new Date().toISOString(),
                 sourceImage: images[currentIndex]?.src || ''
             };
             
-            // Add to array
             existingItems.push(itemToSave);
-            
-            // Save back to localStorage
             localStorage.setItem('yourPieces', JSON.stringify(existingItems));
             
             console.log('✅ Item saved to Your Pieces:', itemToSave);
@@ -42,38 +265,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // function saveItemToPutOns(item) {
-    //     try {
-    //         // Get existing items from localStorage
-    //         const existingItems = JSON.parse(localStorage.getItem('putOns') || '[]');
-            
-    //         // Add unique ID and timestamp
-    //         const itemToSave = {
-    //             ...item,
-    //             id: Date.now() + Math.random(), // Unique ID
-    //             addedAt: new Date().toISOString(),
-    //             sourceImage: images[currentIndex]?.src || ''
-    //         };
-            
-    //         // Add to array
-    //         existingItems.push(itemToSave);
-            
-    //         // Save back to localStorage
-    //         localStorage.setItem('putOns', JSON.stringify(existingItems));
-            
-    //         console.log('✅ Item saved to Put Ons:', itemToSave);
-    //         return true;
-    //     } catch (error) {
-    //         console.error('❌ Error saving item:', error);
-    //         return false;
-    //     }
-    // }
-
     // ========================================
     // AI CLOTHING DETECTION FUNCTION
     // ========================================
-    async function detectClothing(imageUrl) {
-        // Show loading state
+    async function detectClothing(imageUrl, postData = {}) {
+        // Fetch interaction data first
+        let interactionData = {};
+        try {
+            const encodedUrl = encodeURIComponent(imageUrl);
+            const response = await fetch(`/api/posts/interactions/${encodedUrl}`, {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                interactionData = data;
+            }
+        } catch (error) {
+            console.error('Error fetching interactions:', error);
+        }
+
+        // Add post info overlay to the image half (LEFT SIDE)
+        const existingOverlay = imageHalf.querySelector('.post-info-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        const overlayHTML = createPostInfoOverlay(postData, interactionData);
+        imageHalf.insertAdjacentHTML('beforeend', overlayHTML);
+
+        // Show loading state on right side (clothing details)
         clothingDetails.innerHTML = `
         <div class="ai-analyzing">
             <div class="spinner"></div>
@@ -82,18 +302,16 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         try {
-            // Make sure URL is complete
             const fullImageUrl = imageUrl.startsWith('http') 
                 ? imageUrl 
                 : window.location.origin + imageUrl;
 
             console.log('🔍 Sending image to AI:', fullImageUrl);
 
-            // Call our backend API
             const response = await fetch('http://localhost:3000/api/detect-clothing', {
                 method: 'POST',
                 headers: {
-                'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ imageUrl: fullImageUrl })
             });
@@ -105,8 +323,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             console.log('✅ Received detection results:', data);
             
+            // Remove the loading spinner
+            const spinner = clothingDetails.querySelector('.ai-analyzing');
+            if (spinner) spinner.remove();
+            
             if (data.success && data.items && data.items.length > 0) {
-                currentItems = data.items; // Store items
+                currentItems = data.items;
                 displayClothingItems(data.items);
             } else {
                 currentItems = [];
@@ -118,6 +340,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error('❌ Detection error:', error);
             currentItems = [];
+            const spinner = clothingDetails.querySelector('.ai-analyzing');
+            if (spinner) spinner.remove();
             clothingDetails.innerHTML = `
                 <h2>Connection Error</h2>
                 <p>Could not connect to the detection service.</p>
@@ -226,30 +450,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function handleFindReplacements(item) {
         alert(`Finding replacements for ${item.name}...`);
-        // Add your replacement finding logic here
     }
 
     async function handleAddToPieces(item, button) {
         try {
-            // Build item data
             const pieceData = {
-            name: item.name || "Unnamed item",
-            type: item.type || "Unknown",
-            brand: item.brand || "",
-            color: item.color || "",
-            size: item.size || "",
-            price: item.price || "",
-            image: item.image || "",
-            category: item.category || "misc",
-            notes: item.notes || "",
-            sourceImage: images[currentIndex]?.src || ""
+                name: item.name || "Unnamed item",
+                type: item.type || "Unknown",
+                brand: item.brand || "",
+                color: item.color || "",
+                size: item.size || "",
+                price: item.price || "",
+                image: item.image || "",
+                category: item.category || "misc",
+                notes: item.notes || "",
+                sourceImage: images[currentIndex]?.src || ""
             };
 
-            // Send to backend
             const res = await fetch("http://localhost:3000/api/putons", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // keep session cookies
+                credentials: "include",
                 body: JSON.stringify(pieceData)
             });
 
@@ -258,34 +479,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let data;
             try {
-            data = JSON.parse(text);
+                data = JSON.parse(text);
             } catch {
-            throw new Error("Invalid JSON response (probably HTML)");
+                throw new Error("Invalid JSON response (probably HTML)");
             }
 
             if (data.success) {
-            console.log("✅ Added to Your Pieces:", data);
-            showNotification("Item added to Your Pieces!");
+                console.log("✅ Added to Your Pieces:", data);
+                showNotification("Item added to Your Pieces!");
 
-            const originalWidth = button.offsetWidth;
-            const originalHeight = button.offsetHeight;
+                const originalWidth = button.offsetWidth;
+                const originalHeight = button.offsetHeight;
 
-            button.textContent = "✓ Added!";
-            button.style.background = "#4CAF50";
-            button.style.width = `${originalWidth}px`;
-            button.style.height = `${originalHeight}px`;
-            button.disabled = true;
+                button.textContent = "✓ Added!";
+                button.style.background = "#4CAF50";
+                button.style.width = `${originalWidth}px`;
+                button.style.height = `${originalHeight}px`;
+                button.disabled = true;
 
-            setTimeout(() => {
-                button.textContent = "Add to Your Pieces";
-                button.style.background = "";
-                button.disabled = false;
-            }, 2000);
+                setTimeout(() => {
+                    button.textContent = "Add to Your Pieces";
+                    button.style.background = "";
+                    button.disabled = false;
+                }, 2000);
             } else if (res.status === 401) {
-            alert("Please log in to save pieces.");
+                alert("Please log in to save pieces.");
             } else {
-            console.error("❌ Failed to add piece:", data.message);
-            showNotification("Failed to save piece.", "error");
+                console.error("❌ Failed to add piece:", data.message);
+                showNotification("Failed to save piece.", "error");
             }
 
         } catch (err) {
@@ -296,7 +517,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function handleAddWishlist(item) {
         try {
-            // Build item data
             const wishlistItem = {
                 name: item.name || "Unnamed item",
                 type: item.type || "Unknown",
@@ -309,17 +529,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 notes: item.notes || ""
             };
 
-            // ✅ Use full backend URL (change port if needed)
             const res = await fetch("http://localhost:3000/api/wishlist", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(wishlistItem),
-
-                // ✅ Include cookies (session)
                 credentials: "include"
             });
 
-            // ✅ Parse safely
             const text = await res.text();
             console.log("📥 Raw wishlist response:", text);
 
@@ -347,7 +563,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showNotification(message, type = 'success') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
@@ -366,7 +581,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         document.body.appendChild(notification);
         
-        // Remove after 3 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => notification.remove(), 300);
@@ -381,39 +595,63 @@ document.addEventListener("DOMContentLoaded", () => {
         const isExpanded = targetItem.classList.contains('expanded');
         
         if (isExpanded) {
-            // Collapse the item
             targetItem.classList.remove('expanded');
             targetItem.querySelector('.expanded-content').style.display = 'none';
             
-            // Show all other items
             allItems.forEach(item => {
                 item.style.display = 'block';
             });
             
-            // Reset grid layout
             clothingGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
         } else {
-            // Collapse all items first
             allItems.forEach(item => {
                 item.classList.remove('expanded');
                 item.querySelector('.expanded-content').style.display = 'none';
             });
             
-            // Expand the target item
             targetItem.classList.add('expanded');
             targetItem.querySelector('.expanded-content').style.display = 'block';
             
-            // Hide other items
             allItems.forEach(item => {
                 if (item !== targetItem) {
                     item.style.display = 'none';
                 }
             });
             
-            // Make grid single column for expanded view
             clothingGrid.style.gridTemplateColumns = '1fr';
         }
     }
+
+    // Get image data by URL
+    function getImageData(imageUrl) {
+        // Try to find matching image data from the loaded JSON
+        const relativePath = imageUrl.replace(window.location.origin, '');
+        return imagesData.find(img => img.url === relativePath) || {
+            url: relativePath,
+            caption: '',
+            timestamp: '',
+            userId: null,
+            userName: 'Anonymous User',
+            Gender: [],
+            Style: [],
+            Season: []
+        };
+    }
+
+    // Load images data from JSON
+    async function loadImagesData() {
+        try {
+            const response = await fetch('/data/images.json');
+            imagesData = await response.json();
+            console.log('✅ Loaded images data:', imagesData.length, 'images');
+        } catch (error) {
+            console.error('Error loading images data:', error);
+            imagesData = [];
+        }
+    }
+
+    // Initialize images data
+    loadImagesData();
 
     // Wait for dynamically loaded images
     const observer = new MutationObserver(() => {
@@ -436,7 +674,6 @@ document.addEventListener("DOMContentLoaded", () => {
         reel = document.createElement('div');
         reel.className = 'image-reel';
         
-        // Create all image elements in the reel
         images.forEach((img, index) => {
             const reelImageContainer = document.createElement('div');
             reelImageContainer.className = 'reel-image';
@@ -451,7 +688,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         imageHalf.appendChild(reel);
         
-        // Hide the original placeholder
         placeholderImg.style.opacity = '0';
         placeholderImg.style.pointerEvents = 'none';
     }
@@ -464,10 +700,8 @@ document.addEventListener("DOMContentLoaded", () => {
         
         currentIndex = index;
         
-        // Position the reel to show the current image
         reel.style.transform = `translateY(-${currentIndex * 100}%)`;
         
-        // Fade in current image, fade out others
         const reelImages = reel.querySelectorAll('.reel-image');
         reelImages.forEach((container, i) => {
             if (i === currentIndex) {
@@ -477,8 +711,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
         
-        // Run AI detection on the current image
-        detectClothing(images[currentIndex].src);
+        // Get post data and run detection
+        const postData = getImageData(images[currentIndex].src);
+        detectClothing(images[currentIndex].src, postData);
         
         imageInfoScreen.classList.add("active");
         overlay.classList.add("active");
@@ -492,15 +727,13 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const reelImages = reel.querySelectorAll('.reel-image');
             
-            // Fade out current, fade in next
             reelImages[currentIndex - 1].classList.remove('active');
             reelImages[currentIndex].classList.add('active');
             
-            // Scroll the reel
             reel.style.transform = `translateY(-${currentIndex * 100}%)`;
             
-            // Run AI detection on new image
-            detectClothing(images[currentIndex].src);
+            const postData = getImageData(images[currentIndex].src);
+            detectClothing(images[currentIndex].src, postData);
             
             setTimeout(() => {
                 isScrolling = false;
@@ -515,15 +748,13 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const reelImages = reel.querySelectorAll('.reel-image');
             
-            // Fade out current, fade in previous
             reelImages[currentIndex + 1].classList.remove('active');
             reelImages[currentIndex].classList.add('active');
             
-            // Scroll the reel
             reel.style.transform = `translateY(-${currentIndex * 100}%)`;
             
-            // Run AI detection on new image
-            detectClothing(images[currentIndex].src);
+            const postData = getImageData(images[currentIndex].src);
+            detectClothing(images[currentIndex].src, postData);
             
             setTimeout(() => {
                 isScrolling = false;

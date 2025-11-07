@@ -298,34 +298,11 @@ filterBtns.forEach(btn => {
     });
 });
 
-// Upload function (placeholder)
-function uploadPiece() {
-    alert('Upload functionality would open a file picker here. Connect this to your backend upload system.');
-    // You would implement actual file upload logic here
-}
-
 // ========================================
 // INITIALIZE ON PAGE LOAD
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎨 Build Outfit page loaded');
-    
-    // Debug: Check what's in localStorage
-    console.log('🔍 Checking localStorage...');
-    const putOnsData = localStorage.getItem('putOns');
-    console.log('📦 Raw putOns data:', putOnsData);
-    
-    if (putOnsData) {
-        try {
-            const parsed = JSON.parse(putOnsData);
-            console.log('✅ Parsed putOns data:', parsed);
-            console.log('📊 Number of items:', parsed.length);
-        } catch (e) {
-            console.error('❌ Error parsing putOns data:', e);
-        }
-    } else {
-        console.log('⚠️ No putOns data found in localStorage');
-    }
     
     loadPutOns();
 });

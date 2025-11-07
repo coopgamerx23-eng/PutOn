@@ -600,3 +600,200 @@ html, body {
         opacity: 0;
     }
 }
+
+.post-info-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    color: white;
+    pointer-events: none;
+}
+
+/* Top section - Profile info on top right */
+.post-header-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 8px 12px;
+    border-radius: 20px;
+    pointer-events: auto;
+}
+
+.post-author-avatar-overlay {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.post-author-name-overlay {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Date on top left */
+.post-date-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 13px;
+    color: white;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 6px 12px;
+    border-radius: 12px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+/* Interaction Buttons at Bottom */
+.post-interactions-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.interaction-btn-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    min-width: 70px;
+}
+
+.interaction-btn-overlay:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.interaction-btn-overlay:active {
+    transform: translateY(0);
+}
+
+.interaction-btn-overlay svg {
+    width: 22px;
+    height: 22px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.interaction-btn-overlay.liked {
+    background: rgba(233, 30, 99, 0.7);
+    border-color: rgba(233, 30, 99, 0.8);
+}
+
+.interaction-btn-overlay.liked svg {
+    fill: white;
+    stroke: white;
+}
+
+.interaction-btn-overlay.reposted {
+    background: rgba(76, 175, 80, 0.7);
+    border-color: rgba(76, 175, 80, 0.8);
+}
+
+.interaction-btn-overlay.saved {
+    background: rgba(255, 152, 0, 0.7);
+    border-color: rgba(255, 152, 0, 0.8);
+}
+
+.interaction-btn-overlay.saved svg {
+    fill: white;
+}
+
+.interaction-count-overlay {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .post-header-overlay {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+    }
+    
+    .post-author-avatar-overlay {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .post-author-name-overlay {
+        font-size: 13px;
+    }
+    
+    .post-date-overlay {
+        top: 10px;
+        left: 10px;
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+    
+    .post-interactions-overlay {
+        bottom: 10px;
+        gap: 6px;
+    }
+    
+    .interaction-btn-overlay {
+        padding: 8px 12px;
+        min-width: 60px;
+        font-size: 11px;
+    }
+    
+    .interaction-btn-overlay svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Animation for overlay appearing */
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post-info-overlay {
+    animation: slideUpFade 0.4s ease-out;
+}
+
+/* Ensure back button stays on top */
+.back-button {
+    z-index: 10 !important;
+}
