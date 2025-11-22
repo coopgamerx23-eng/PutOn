@@ -68,8 +68,21 @@ document.addEventListener("base:ready", async() => {
                     document.getElementById("show-recommendations-switch").classList.add("active");
                 } else {
                     document.getElementById("show-recommendations-switch").classList.remove("active");
+                } if (data.user.hide_saved_content == "true") {
+                    document.getElementById("hide-saved-switch").classList.add("active");
+                } else {
+                    document.getElementById("hide-saved-switch").classList.remove("active");
+                } if (data.user.show_following == "true") {
+                    document.getElementById("show-following-switch").classList.add("active");
+                } else {
+                    document.getElementById("show-following-switch").classList.remove("active");
+                } if (data.user.show_followers == "true") {
+                    document.getElementById("show-followers-switch").classList.add("active");
+                } else {
+                    document.getElementById("show-followers-switch").classList.remove("active");
                 }
                 document.getElementById("display-preferred-style-input").value = data.user.preferred_style;
+                document.getElementById("display-language-input").value = data.user.language;
             } catch {
                 // Nothing
             }

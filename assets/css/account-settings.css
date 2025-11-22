@@ -2,33 +2,38 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
 body {
     min-height: 100%;
 }
 
-/* Main Container */
 .container {
-    display: grid;
-    grid-template-columns: 500px 1fr;
-    gap: 0;
+    display: block;
     max-width: 1600px;
     margin: 0 auto;
-    margin-top: 68px;
-    min-height: calc(100vh - 60px);
     z-index: 10;
+    position: relative;
 }
 
-/* Left Side - Profile & Posts */
 .left-side {
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(10px);
     border-right: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 40px;
-    position: relative;
-    overflow-y: auto;
+    padding: 30px;
+    padding-bottom: 0;
+    padding-top: 100px;
+    position: fixed;
+    /* top: 68px; */
+    left: 0;
+    width: 500px;
+    height: calc(100vh - 68px);
     box-shadow: 12px 0 51px rgba(0, 0, 0, 0.15);
+
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
 }
 
 /* Profile Section */
@@ -36,23 +41,98 @@ body {
     text-align: center;
     margin-bottom: 40px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .profile-pic-container {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    margin: 0 auto 20px;
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
 }
 
 .profile-pic {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    backdrop-filter: blur(10px);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #2a7f62;
+  transition: opacity 0.3s ease;
+}
+
+.profile-pic-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-pic-container:hover .profile-pic-overlay {
+  opacity: 1;
+}
+
+.upload-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.upload-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.upload-icon span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.remove-pic-btn {
+  margin-top: 10px;
+  padding: 5px 15px;
+  background: rgba(244, 67, 54, 0.8);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.remove-pic-btn:hover {
+  background: rgba(244, 67, 54, 1);
+}
+
+/* Upload progress indicator */
+.upload-progress {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #2a7f62;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .profile-name {
@@ -103,6 +183,7 @@ body {
     margin-bottom: 30px;
     width: 100%;
     box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    flex-shrink: 0;
 }
 
 .posts-toggle button {
@@ -130,6 +211,16 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     perspective: 1000px;
+
+    /* scrolling lives here */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile devices */
+    flex: 1;                            /* take remaining vertical space inside left-side */
+
+    /* Prevent scroll chaining to ancestor/viewport */
+    overscroll-behavior: contain;
+
+    padding-bottom: 40px;
 }
 
 .post-item {
@@ -223,8 +314,22 @@ body {
 .right-side {
     background: transparent;
     padding: 60px 80px;
+    top: 50px;
+    margin-bottom: 10px;
     overflow-y: auto;
     position: relative;
+    margin-left: 500px;
+
+    height: calc(100vh - 68px);   /* ensure it has its own scrollable area */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain; /* prevents propagation when at top/bottom */
+
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE / Edge Legacy */
+}
+
+.right-side::-webkit-scrollbar {
+    display: none;                /* Chrome / Safari */
 }
 
 .settings-header {
@@ -381,6 +486,7 @@ body {
     cursor: pointer;
     transition: all 0.5s;
     box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.22);
+    margin-bottom: 60px;
 }
 
 .save-button:hover,
@@ -481,12 +587,12 @@ body {
     border: 3px solid rgba(26, 77, 60, 0.3);
     border-top-color: #1a4d3c;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin-loading 1s linear infinite;
     margin-left: 10px;
     vertical-align: middle;
 }
 
-@keyframes spin {
+@keyframes spin-loading {
     to { transform: rotate(360deg); }
 }
 
@@ -509,6 +615,16 @@ body {
 }
 
 @media (max-width: 768px) {
+    .left-side {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+    
+    .right-side {
+        margin-left: 0;
+    }
+    
     .posts-grid {
         grid-template-columns: 1fr;
     }
@@ -517,4 +633,80 @@ body {
         width: 40px;
         height: 40px;
     }
+}
+
+/* See More Button Styles */
+.see-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(42, 127, 98, 0.1);
+    border: 2px dashed rgba(42, 127, 98, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.see-more-btn:hover {
+    background: rgba(42, 127, 98, 0.2);
+    border-color: rgba(42, 127, 98, 0.5);
+    transform: scale(1.02);
+}
+
+.see-more-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #2a7f62;
+}
+
+.see-more-content .dots {
+    font-size: 48px;
+    font-weight: bold;
+    line-height: 0.5;
+    letter-spacing: 4px;
+}
+
+.see-more-content .see-more-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.see-more-content .post-count {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* Animation for see more button */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.see-more-btn:hover .dots {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* View Profile Button */
+.view-profile-btn {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    gap: 6px;
+    z-index: 100;
+    border: none;
+    background: none;
+}
+
+.view-profile-btn svg {
+    width: 16px;
+    height: 16px;
 }

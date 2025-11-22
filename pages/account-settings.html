@@ -12,236 +12,298 @@
     <div class="container">
         <!-- Left Side - Profile & Posts -->
         <div class="left-side">
-        <!-- Profile Header -->
-        <div class="profile-header">
-            <div class="profile-pic-container">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" alt="Profile" class="profile-pic">
-            </div>
-            <h1 class="profile-name">NAME</h1>
-            <p class="profile-username">@username</p>
-            
-            <div class="profile-stats">
-            <div class="stat">
-                <span class="stat-value">248</span>
-                <span class="stat-label">Following</span>
-            </div>
-            <div class="stat">
-                <span class="stat-value">1.2K</span>
-                <span class="stat-label">Followers</span>
-            </div>
-            <div class="stat">
-                <span class="stat-value">350</span>
-                <span class="stat-label">Points</span>
-            </div>
-            </div>
-        </div>
+            <button class="view-profile-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                View Full Profile
+            </button>
 
-        <!-- Posts Toggle -->
-        <div class="posts-toggle">
-            <button class="active" onclick="switchTab(event, 'posts')">Put Ons</button>
-            <button onclick="switchTab(event, 'liked')">Liked</button>
-            <button onclick="switchTab(event, 'saved')">Saved</button>
-            <button onclick="switchTab(event, 'reposted')">Reposted</button>
-        </div>
-
-        <!-- Posts Grid -->
-        <div class="posts-grid" id="postsGrid">
-            <div class="post-item add-post">+</div>
-            
-            <div class="post-item-wrapper">
-            <div class="canvas">
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-            </div>
-            <div class="post-item">
-                <img src="https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400&h=600&fit=crop" alt="Post 1">
-            </div>
+            <div class="profile-header">
+                <div class="profile-pic-container">
+                    <img id="settingsProfilePic" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" alt="Profile" class="profile-pic">
+                    <div class="profile-pic-overlay">
+                        <label for="profilePicInput" class="upload-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            <span>Change Photo</span>
+                        </label>
+                        <input type="file" id="profilePicInput" accept="image/*" style="display: none;">
+                        <button id="removeProfilePicBtn" class="remove-pic-btn" style="display: none;">Remove</button>
+                    </div>
+                </div>
+                <h1 class="profile-name" id="settingsProfileName">NAME</h1>
+                <p class="profile-username" id="settingsProfileUsername">@username</p>
+                
+                <div class="profile-stats">
+                    <div class="stat">
+                        <span class="stat-value">248</span>
+                        <span class="stat-label">Following</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">1.2K</span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">350</span>
+                        <span class="stat-label">Points</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="post-item-wrapper">
-            <div class="canvas">
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-            </div>
-            <div class="post-item">
-                <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400&h=600&fit=crop" alt="Post 2">
-            </div>
+            <!-- Posts Toggle -->
+            <div class="posts-toggle">
+                <button class="active" onclick="switchTab(event, 'posts')">Put Ons</button>
+                <button onclick="switchTab(event, 'liked')">Liked</button>
+                <button onclick="switchTab(event, 'saved')">Saved</button>
+                <button onclick="switchTab(event, 'reposted')">Reposted</button>
             </div>
 
-            <div class="post-item-wrapper">
-            <div class="canvas">
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
-                <div></div><div></div><div></div><div></div><div></div>
+            <!-- Posts Grid -->
+            <div class="posts-grid" id="postsGrid">
+                <div class="post-item add-post">+</div>
+                
+                <div class="post-item-wrapper">
+                <div class="canvas">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="post-item">
+                    <img src="https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400&h=600&fit=crop" alt="Post 1">
+                </div>
+                </div>
+
+                <div class="post-item-wrapper">
+                <div class="canvas">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="post-item">
+                    <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400&h=600&fit=crop" alt="Post 2">
+                </div>
+                </div>
+
+                <div class="post-item-wrapper">
+                <div class="canvas">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="post-item">
+                    <img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=600&fit=crop" alt="Post 3">
+                </div>
+                </div>
             </div>
-            <div class="post-item">
-                <img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=600&fit=crop" alt="Post 3">
-            </div>
-            </div>
-        </div>
         </div>
 
         <!-- Right Side - Settings -->
         <div class="right-side">
-        <div class="settings-header">
-            <h1>Settings</h1>
-            <p>Manage your account and preferences</p>
-        </div>
+            <div class="settings-header">
+                <h1>Settings</h1>
+                <p>Manage your account and preferences</p>
+            </div>
 
-        <!-- Account Settings -->
-        <div class="settings-section">
-            <h2>Account Settings</h2>
-            <div class="form-group">
-            <label>Display Name</label>
-            <input id="display-name-input" type="text" placeholder="Your display name">
-            </div>
-            <div class="form-group">
-            <label>Username</label>
-            <input id="display-username-input" type="text" placeholder="@username">
-            </div>
-            <div class="form-group">
-            <label>Email Address</label>
-            <input id="display-email-input" type="email" placeholder="your@email.com">
-            </div>
-            <div class="form-group">
-            <label>Bio</label>
-            <input id="display-bio-input" type="text" placeholder="Tell us about yourself...">
-            </div>
-            <div class="form-row">
-            <div class="form-group">
-                <label>Location</label>
-                <input id="display-location-input" type="text" placeholder="City, Country">
-            </div>
-            <div class="form-group">
-                <label>Birthday</label>
-                <input id="display-birthday-input" type="date">
-            </div>
-            </div>
-        </div>
-
-        <!-- Clothing Settings -->
-        <div class="settings-section">
-            <h2>Clothing Measurements</h2>
-            <div class="form-row">
-            <div class="form-group">
-                <label>Shirt Size</label>
-                <select id="display-shirt-size-input">
-                <option>Select size</option>
-                <option>XS</option>
-                <option>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>XXL</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Shoe Size (US)</label>
-                <select id="display-shoe-size-input">
-                <option>Select size</option>
-                <option>7</option>
-                <option>7.5</option>
-                <option>8</option>
-                <option>8.5</option>
-                <option>9</option>
-                <option>9.5</option>
-                <option>10</option>
-                <option>10.5</option>
-                <option>11</option>
-                <option>11.5</option>
-                <option>12</option>
-                </select>
-            </div>
-            </div>
-            <div class="form-row">
-            <div class="form-group">
-                <label>Waist (inches)</label>
-                <input id="display-waist-size-input" type="number" placeholder="32" min="24" max="50">
-            </div>
-            <div class="form-group">
-                <label>Inseam (inches)</label>
-                <input id="display-inseam-input" type="number" placeholder="30" min="26" max="38">
-            </div>
-            </div>
-            <div class="form-row">
-            <div class="form-group">
-                <label>Chest (inches)</label>
-                <input id="display-chest-size-input" type="number" placeholder="38" min="30" max="60">
-            </div>
-            <div class="form-group">
-                <label>Height (cm)</label>
-                <input id="display-height-input" type="number" placeholder="175" min="140" max="220">
-            </div>
-            </div>
-        </div>
-
-        <!-- App Preferences -->
-        <div class="settings-section">
-            <h2>App Preferences</h2>
-            
-            <div class="toggle-option">
-                <div class="toggle-label">
-                    Dark Mode
-                    <small>Switch between light and dark theme</small>
+            <!-- Account Settings -->
+            <div class="settings-section">
+                <h2>Account Settings</h2>
+                <div class="form-group">
+                <label>Display Name</label>
+                <input id="display-name-input" type="text" placeholder="Your display name">
                 </div>
-                <div class="toggle-switch" id="dark-mode-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-
-            <div class="toggle-option">
-                <div class="toggle-label">
-                    Push Notifications
-                    <small>Receive notifications about new posts and followers</small>
+                <div class="form-group">
+                <label>Username</label>
+                <input id="display-username-input" type="text" placeholder="@username">
                 </div>
-                <div class="toggle-switch" id="push-notifications-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-
-            <div class="toggle-option">
-                <div class="toggle-label">
-                    Email Updates
-                    <small>Get weekly updates about new styles and trends</small>
+                <div class="form-group">
+                <label>Email Address</label>
+                <input id="display-email-input" type="email" placeholder="your@email.com">
                 </div>
-                <div class="toggle-switch" id="email-updates-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-
-            <div class="toggle-option">
-                <div class="toggle-label">
-                    Private Profile
-                    <small>Only followers can see your posts</small>
+                <div class="form-group">
+                <label>Bio</label>
+                <input id="display-bio-input" type="text" placeholder="Tell us about yourself...">
                 </div>
-                <div class="toggle-switch" id="private-profile-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-
-            <div class="toggle-option">
-                <div class="toggle-label">
-                    Show Size Recommendations
-                    <small>Get personalized size suggestions when shopping</small>
+                <div class="form-row">
+                <div class="form-group">
+                    <label>Location</label>
+                    <input id="display-location-input" type="text" placeholder="City, Country">
                 </div>
-                <div class="toggle-switch" id="show-recommendations-switch" onclick="this.classList.toggle('active')"></div>
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <input id="display-birthday-input" type="date">
+                </div>
+                </div>
             </div>
 
-            <div class="form-group" style="margin-top: 25px;">
-                <label>Preferred Style</label>
-                <select id="display-preferred-style-input">
-                    <option>All Styles</option>
-                    <option>Streetwear</option>
-                    <option>Formal</option>
-                    <option>Casual</option>
-                    <option>Athletic</option>
-                    <option>Vintage</option>
-                </select>
+            <!-- Clothing Settings -->
+            <div class="settings-section">
+                <h2>Clothing Measurements</h2>
+                <div class="form-row">
+                <div class="form-group">
+                    <label>Shirt Size</label>
+                    <select id="display-shirt-size-input">
+                    <option>Select size</option>
+                    <option>XS</option>
+                    <option>S</option>
+                    <option>M</option>
+                    <option>L</option>
+                    <option>XL</option>
+                    <option>XXL</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Shoe Size (US)</label>
+                    <select id="display-shoe-size-input">
+                    <option>Select size</option>
+                    <option>7</option>
+                    <option>7.5</option>
+                    <option>8</option>
+                    <option>8.5</option>
+                    <option>9</option>
+                    <option>9.5</option>
+                    <option>10</option>
+                    <option>10.5</option>
+                    <option>11</option>
+                    <option>11.5</option>
+                    <option>12</option>
+                    </select>
+                </div>
+                </div>
+                <div class="form-row">
+                <div class="form-group">
+                    <label>Waist (inches)</label>
+                    <input id="display-waist-size-input" type="number" placeholder="32" min="24" max="50">
+                </div>
+                <div class="form-group">
+                    <label>Inseam (inches)</label>
+                    <input id="display-inseam-input" type="number" placeholder="30" min="26" max="38">
+                </div>
+                </div>
+                <div class="form-row">
+                <div class="form-group">
+                    <label>Chest (inches)</label>
+                    <input id="display-chest-size-input" type="number" placeholder="38" min="30" max="60">
+                </div>
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input id="display-height-input" type="number" placeholder="175" min="140" max="220">
+                </div>
+                </div>
             </div>
-        </div>
 
-        <button class="save-button">Save Changes</button>
-        <button class="logout-button">Log Out</button>
+            <!-- Privacy & Display Settings -->
+            <div class="settings-section">
+                <h2>Privacy & Display</h2>
+                
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Private Profile
+                        <small>Only followers can see your posts</small>
+                    </div>
+                    <div class="toggle-switch" id="private-profile-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Hide Saved Content
+                        <small>Keep your saved posts private from your profile</small>
+                    </div>
+                    <div class="toggle-switch" id="hide-saved-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Show Following List
+                        <small>Let others see who you follow</small>
+                    </div>
+                    <div class="toggle-switch active" id="show-following-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Show Followers List
+                        <small>Let others see your followers</small>
+                    </div>
+                    <div class="toggle-switch active" id="show-followers-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+            </div>
+
+            <!-- App Preferences -->
+            <div class="settings-section">
+                <h2>App Preferences</h2>
+                
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Dark Mode
+                        <small>Switch between light and dark theme</small>
+                    </div>
+                    <div class="toggle-switch" id="dark-mode-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Push Notifications
+                        <small>Receive notifications about new posts and followers</small>
+                    </div>
+                    <div class="toggle-switch" id="push-notifications-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Email Updates
+                        <small>Get weekly updates about new styles and trends</small>
+                    </div>
+                    <div class="toggle-switch" id="email-updates-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="toggle-option">
+                    <div class="toggle-label">
+                        Show Size Recommendations
+                        <small>Get personalized size suggestions when shopping</small>
+                    </div>
+                    <div class="toggle-switch" id="show-recommendations-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 25px;">
+                    <label>Preferred Style</label>
+                    <select id="display-preferred-style-input">
+                        <option>All Styles</option>
+                        <option>Streetwear</option>
+                        <option>Formal</option>
+                        <option>Casual</option>
+                        <option>Athletic</option>
+                        <option>Vintage</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Language</label>
+                    <select id="display-language-input">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Português</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="save-button">Save Changes</button>
+            <button class="logout-button">Log Out</button>
         </div>
     </div>
 

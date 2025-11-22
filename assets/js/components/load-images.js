@@ -43,9 +43,9 @@ export default async function loadImages(selectedFilters = {}) {
         gallery.classList.add("no-images");
         const message = document.createElement("p");
 
-        if (selectedFilters["friends"]?.length) {
+        if (selectedFilters["page"][0] === 'friends') {
             message.textContent = "You currently have no friends added.";
-        } else if (selectedFilters["following"]?.length) {
+        } else if (selectedFilters["page"][0] === 'following') {
             message.textContent = "You are not currently following any creators.";
         } else {
             message.textContent = "No images match the selected filters.";

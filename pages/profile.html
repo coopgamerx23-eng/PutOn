@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - PutOn</title>
+  <link rel="stylesheet" href="/assets/css/profile.css">
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-pic-container">
+                    <img id="profilePic" src="" alt="Profile" class="profile-pic">
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name-row">
+                        <h1 class="profile-name" id="profileName">Loading...</h1>
+                        <button class="follow-btn" id="followBtn" style="display: none;">Follow</button>
+                        <button class="edit-profile-btn" id="editProfileBtn" style="display: none;">
+                            <a href="/pages/account-settings.html">Edit Profile</a>
+                        </button>
+                    </div>
+                    <p class="profile-username" id="profileUsername">@username</p>
+                    <p class="profile-bio" id="profileBio"></p>
+                    <p class="profile-location" id="profileLocation"></p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="followingCount">0</span>
+                            <span class="stat-label">Following</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="followersCount">0</span>
+                            <span class="stat-label">Followers</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="postsCount">0</span>
+                            <span class="stat-label">Posts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts Toggle -->
+            <div class="posts-toggle">
+                <button class="active" data-tab="posts">Posts</button>
+                <button data-tab="liked">Liked</button>
+                <button data-tab="saved">Saved</button>
+                <button data-tab="reposted">Reposted</button>
+            </div>
+
+            <!-- Posts Grid -->
+            <div class="posts-grid" id="postsGrid">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading posts...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/assets/js/pages/page-defaults.js"></script>
+    <script type="module" src="/assets/js/components/load-user.js"></script>
+    <script type="module" src="/assets/js/pages/profile.js"></script>
+</body>
+</html>

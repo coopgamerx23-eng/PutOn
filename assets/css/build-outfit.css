@@ -6,7 +6,6 @@ body {
     min-height: 100vh;
 }
 
-/* Grid background effect - REMOVED */
 .grid-background {
     display: none;
 }
@@ -88,13 +87,13 @@ body {
     position: relative;
 }
 
-.wardrobe-slot:hover {
+.outfit-slot:hover {
     border-color: rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.1);
     transform: scale(1.02);
 }
 
-.wardrobe-slot.has-item {
+.outfit-slot.has-item {
     border-style: solid;
     border-color: rgba(112, 144, 250, 0.8);
     background: rgba(112, 144, 250, 0.1);
@@ -119,11 +118,12 @@ body {
 .slot-item {
     width: 100%;
     height: 100%;
+    max-height: 80px;
     object-fit: contain;
     border-radius: 10px;
 }
 
-/* Collection Sections (Right) */
+/* Collections Section (Right) */
 .collections-section {
     flex: 1;
     display: flex;
@@ -165,6 +165,7 @@ body {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    margin-bottom: 15px;
 }
 
 .filter-btn {
@@ -192,17 +193,6 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 20px;
-    margin-top: 15px;
-}
-
-.items-grid.loading::after {
-    content: "Loading your pieces...";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
 }
 
 .item-card {
@@ -268,7 +258,6 @@ body {
     z-index: 1;
 }
 
-/* Corner PNG decoration for Put-Ons section */
 .corner-decoration {
     position: absolute;
     top: -10px;
@@ -286,7 +275,6 @@ body {
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
-/* Drag and drop styles */
 .dragging {
     opacity: 0.5;
     cursor: grabbing;
@@ -296,17 +284,6 @@ body {
     background: rgba(112, 144, 250, 0.3);
     border-color: rgba(112, 144, 250, 1);
     transform: scale(1.05);
-}
-
-@media (max-width: 1024px) {
-    .builder-container {
-    flex-direction: column;
-    }
-    
-    .outfit-section {
-    flex: 1;
-    width: 100%;
-    }
 }
 
 .delete-item-btn {
@@ -342,4 +319,86 @@ body {
 
 .delete-item-btn:active {
     transform: scale(0.95);
+}
+
+/* Save Outfit Button */
+.save-outfit-btn {
+    width: 100%;
+    padding: 16px 24px;
+    margin-top: 30px;
+    background: linear-gradient(135deg, #f7931e 0%, #ffb662 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(247, 147, 30, 0.4);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.save-outfit-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.save-outfit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(247, 147, 30, 0.6);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.save-outfit-btn:hover::before {
+    left: 100%;
+}
+
+.save-outfit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(247, 147, 30, 0.4);
+}
+
+.save-outfit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-icon {
+    font-size: 24px;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
+}
+
+@media (max-width: 1024px) {
+    .builder-container {
+        flex-direction: column;
+    }
+    
+    .outfit-section {
+        flex: 1;
+        width: 100%;
+    }
 }
