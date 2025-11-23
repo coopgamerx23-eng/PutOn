@@ -52,14 +52,108 @@
       </div>
 
       <!-- Items Grid -->
-      <div id="items-view" class="items-grid">
-        <!-- Items will be populated by JavaScript -->
-      </div>
+      <div id="items-view" class="items-grid"></div>
 
       <!-- Outfits Grid -->
-      <div id="outfits-view" class="outfits-grid hidden">
-        <!-- Outfits will be populated by JavaScript -->
+      <div id="outfits-view" class="outfits-grid hidden"></div>
+
+      <!-- Item Details Modal -->
+  <div id="item-details-modal" class="modal-overlay hidden">
+    <div class="modal-content item-details-modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="details-modal-title">Item Details</h2>
+        <button id="close-details-modal-btn" class="close-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
       </div>
+      
+      <div class="details-modal-body">
+        <div class="details-image-wrapper">
+          <img id="details-modal-image" src="" alt="Item" class="details-modal-img" />
+        </div>
+        
+        <!-- View Mode -->
+        <div id="details-view-mode" class="details-info">
+          <div class="details-row">
+            <span class="details-label">Name:</span>
+            <span class="details-value" id="view-name">-</span>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Category:</span>
+            <span class="details-value" id="view-category">-</span>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Brand:</span>
+            <span class="details-value" id="view-brand">-</span>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Color:</span>
+            <span class="details-value" id="view-color">-</span>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Size:</span>
+            <span class="details-value" id="view-size">-</span>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Price:</span>
+            <span class="details-value" id="view-price">-</span>
+          </div>
+          <div class="details-row">
+            <span class="details-label">Material:</span>
+            <span class="details-value" id="view-material">-</span>
+          </div>
+        </div>
+        
+        <!-- Edit Mode -->
+        <div id="details-edit-mode" class="details-info hidden">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" id="edit-name" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="edit-category" class="form-select">
+              <option value="tops">Tops</option>
+              <option value="bottoms">Bottoms</option>
+              <option value="dresses">Dresses</option>
+              <option value="outerwear">Outerwear</option>
+              <option value="shoes">Shoes</option>
+              <option value="accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Brand</label>
+            <input type="text" id="edit-brand" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <input type="text" id="edit-color" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Size</label>
+            <input type="text" id="edit-size" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Price</label>
+            <input type="text" id="edit-price" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Material</label>
+            <input type="text" id="edit-material" class="form-input" />
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button id="edit-details-btn" class="btn-edit">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+          Edit Details
+        </button>
+        <button id="save-details-btn" class="btn-save hidden">Save Changes</button>
+        <button id="cancel-edit-btn" class="btn-cancel hidden">Cancel</button>
+      </div>
+    </div>
+  </div>
 
       <!-- Empty State -->
       <div id="empty-state" class="empty-state hidden">
@@ -95,23 +189,13 @@
       <!-- Upload Input -->
       <div id="upload-input" class="form-group">
         <label class="form-label">Upload Image</label>
-        <input
-          type="file"
-          id="file-input"
-          accept="image/*"
-          class="form-input"
-        />
+        <input type="file" id="file-input" accept="image/*" class="form-input"/>
       </div>
 
       <!-- URL Input -->
       <div id="url-input" class="form-group hidden">
         <label class="form-label">Image URL</label>
-        <input
-          type="url"
-          id="url-text-input"
-          placeholder="https://example.com/image.jpg"
-          class="form-input"
-        />
+        <input type="url" id="url-text-input" placeholder="https://example.com/image.jpg" class="form-input"/>
       </div>
 
       <!-- Image Preview -->
@@ -119,38 +203,175 @@
         <img id="preview-img" src="" alt="Preview" class="preview-img" />
       </div>
 
-      <!-- Item Name -->
-      <div class="form-group">
-        <label class="form-label">Item Name</label>
-        <input
-          type="text"
-          id="item-name-input"
-          placeholder="e.g., Blue Denim Jacket"
-          class="form-input"
-        />
+      <!-- Section Tabs -->
+      <div class="section-tabs">
+        <button id="details-tab" class="section-tab active">Item Details</button>
+        <button id="name-tab" class="section-tab">Item Name</button>
       </div>
 
-      <!-- Category -->
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select id="category-input" class="form-select">
-          <option value="tops">Tops</option>
-          <option value="bottoms">Bottoms</option>
-          <option value="dresses">Dresses</option>
-          <option value="outerwear">Outerwear</option>
-          <option value="shoes">Shoes</option>
-          <option value="accessories">Accessories</option>
-        </select>
+      <!-- Item Details Section -->
+      <div id="details-section" class="form-section">
+        <!-- Brand -->
+        <div class="form-group">
+          <label class="form-label">Brand</label>
+          <div class="combo-select">
+            <select id="brand-select" class="form-select combo-dropdown">
+              <option value="">Select or type brand...</option>
+              <option value="Nike">Nike</option>
+              <option value="Adidas">Adidas</option>
+              <option value="Zara">Zara</option>
+              <option value="H&M">H&M</option>
+              <option value="Uniqlo">Uniqlo</option>
+              <option value="Gap">Gap</option>
+              <option value="Levi's">Levi's</option>
+              <option value="Ralph Lauren">Ralph Lauren</option>
+              <option value="Tommy Hilfiger">Tommy Hilfiger</option>
+              <option value="Gucci">Gucci</option>
+              <option value="Prada">Prada</option>
+              <option value="Louis Vuitton">Louis Vuitton</option>
+              <option value="Calvin Klein">Calvin Klein</option>
+              <option value="Banana Republic">Banana Republic</option>
+              <option value="J.Crew">J.Crew</option>
+              <option value="Forever 21">Forever 21</option>
+              <option value="ASOS">ASOS</option>
+              <option value="Mango">Mango</option>
+              <option value="Other">Other (type below)</option>
+            </select>
+            <input type="text" id="brand-custom" class="form-input combo-input hidden" placeholder="Enter brand name..."/>
+          </div>
+        </div>
+
+        <!-- Color -->
+        <div class="form-group">
+          <label class="form-label">Color</label>
+          <div class="combo-select">
+            <select id="color-select" class="form-select combo-dropdown">
+              <option value="">Select or type color...</option>
+              <option value="Black">Black</option>
+              <option value="White">White</option>
+              <option value="Gray">Gray</option>
+              <option value="Navy">Navy</option>
+              <option value="Blue">Blue</option>
+              <option value="Red">Red</option>
+              <option value="Green">Green</option>
+              <option value="Yellow">Yellow</option>
+              <option value="Orange">Orange</option>
+              <option value="Pink">Pink</option>
+              <option value="Purple">Purple</option>
+              <option value="Brown">Brown</option>
+              <option value="Beige">Beige</option>
+              <option value="Cream">Cream</option>
+              <option value="Burgundy">Burgundy</option>
+              <option value="Olive">Olive</option>
+              <option value="Teal">Teal</option>
+              <option value="Multi-color">Multi-color</option>
+              <option value="Other">Other (type below)</option>
+            </select>
+            <input type="text" id="color-custom" class="form-input combo-input hidden" placeholder="Enter color..."/>
+          </div>
+        </div>
+
+        <!-- Size -->
+        <div class="form-group">
+          <label class="form-label">Size</label>
+          <div class="combo-select">
+            <select id="size-select" class="form-select combo-dropdown">
+              <option value="">Select or type size...</option>
+              <option value="XXS">XXS</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+              <option value="0">0</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="12">12</option>
+              <option value="14">14</option>
+              <option value="One Size">One Size</option>
+              <option value="Other">Other (type below)</option>
+            </select>
+            <input type="text" id="size-custom" class="form-input combo-input hidden" placeholder="Enter size..."/>
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="form-group">
+          <label class="form-label">Price</label>
+          <div class="combo-select">
+            <select id="price-select" class="form-select combo-dropdown">
+              <option value="">Select or type price...</option>
+              <option value="$0-25">$0 - $25</option>
+              <option value="$25-50">$25 - $50</option>
+              <option value="$50-100">$50 - $100</option>
+              <option value="$100-200">$100 - $200</option>
+              <option value="$200-500">$200 - $500</option>
+              <option value="$500+">$500+</option>
+              <option value="Other">Other (type below)</option>
+            </select>
+            <input type="text" id="price-custom" class="form-input combo-input hidden" placeholder="Enter price (e.g., $75)..."/>
+          </div>
+        </div>
+
+        <!-- Material -->
+        <div class="form-group">
+          <label class="form-label">Material</label>
+          <div class="combo-select">
+            <select id="material-select" class="form-select combo-dropdown">
+              <option value="">Select or type material...</option>
+              <option value="Cotton">Cotton</option>
+              <option value="Polyester">Polyester</option>
+              <option value="Denim">Denim</option>
+              <option value="Wool">Wool</option>
+              <option value="Linen">Linen</option>
+              <option value="Silk">Silk</option>
+              <option value="Leather">Leather</option>
+              <option value="Suede">Suede</option>
+              <option value="Cashmere">Cashmere</option>
+              <option value="Nylon">Nylon</option>
+              <option value="Rayon">Rayon</option>
+              <option value="Velvet">Velvet</option>
+              <option value="Fleece">Fleece</option>
+              <option value="Cotton Blend">Cotton Blend</option>
+              <option value="Synthetic">Synthetic</option>
+              <option value="Other">Other (type below)</option>
+            </select>
+            <input type="text" id="material-custom" class="form-input combo-input hidden" placeholder="Enter material..."/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item Name Section -->
+      <div id="name-section" class="form-section hidden">
+        <!-- Item Name -->
+        <div class="form-group">
+          <label class="form-label">Item Name</label>
+          <input type="text" id="item-name-input" placeholder="e.g., Blue Denim Jacket" class="form-input"/>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="category-input" class="form-select">
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="dresses">Dresses</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="shoes">Shoes</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
       </div>
 
       <!-- Actions -->
       <div class="modal-actions">
-        <button id="cancel-btn" class="btn-cancel">
-          Cancel
-        </button>
-        <button id="save-item-btn" class="btn-save">
-          Add Item
-        </button>
+        <button id="cancel-btn" class="btn-cancel">Cancel</button>
+        <button id="save-item-btn" class="btn-save">Add Item</button>
       </div>
     </div>
   </div>

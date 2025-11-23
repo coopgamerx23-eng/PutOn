@@ -10,14 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentIndex = -1;
     let isScrolling = false;
     let reel = null;
-    let currentItems = []; // Store current detected items
-    let imagesData = []; // Store full image data from JSON
+    let imagesData = [];
 
     // ========================================
     // POST INFO FUNCTIONS
     // ========================================
     
-    // Format date to readable string
     function formatPostDate(dateString) {
         if (!dateString) return 'Recently';
         
@@ -46,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             timestamp = '', 
             userId = null,
             userName = 'Anonymous User',
-            userProfilePic = null, // Add this
+            userProfilePic = null,
             Gender = [], 
             Style = [], 
             Season = []
@@ -61,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
             isSaved = false
         } = interactionData;
         
-        // Use custom profile picture or fall back to generated avatar
         const profilePicSrc = userProfilePic 
             ? userProfilePic 
             : `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=2a7f62&color=fff`;
@@ -114,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    // Toggle post info collapse/expand
     window.togglePostInfo = function() {
         const overlay = document.getElementById('postInfoOverlay');
         if (overlay) {
@@ -122,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Toggle like
     window.toggleLike = async function(postUrl, button) {
         try {
             const isLiked = button.classList.contains('liked');
@@ -139,14 +134,10 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (data.success) {
                 button.classList.toggle('liked');
-                
-                // Update count in overlay
                 const countSpan = button.querySelector('.interaction-count-overlay');
                 if (countSpan) {
                     countSpan.textContent = data.likes;
                 }
-                
-                // Animation
                 if (!isLiked) {
                     button.style.transform = 'scale(1.15) translateY(-2px)';
                     setTimeout(() => {
@@ -160,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Toggle repost
     window.toggleRepost = async function(postUrl, button) {
         try {
             const isReposted = button.classList.contains('reposted');
@@ -180,13 +170,10 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (data.success) {
                 button.classList.toggle('reposted');
-                
-                // Update count in overlay
                 const countSpan = button.querySelector('.interaction-count-overlay');
                 if (countSpan) {
                     countSpan.textContent = data.reposts;
                 }
-                
                 showNotification(isReposted ? 'Removed from reposts' : 'Reposted!');
             }
         } catch (error) {
@@ -195,7 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Toggle save
     window.toggleSave = async function(postUrl, button) {
         try {
             const isSaved = button.classList.contains('saved');
@@ -212,13 +198,10 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (data.success) {
                 button.classList.toggle('saved');
-                
-                // Update count in overlay
                 const countSpan = button.querySelector('.interaction-count-overlay');
                 if (countSpan) {
                     countSpan.textContent = data.saves;
                 }
-                
                 showNotification(isSaved ? 'Removed from saved' : 'Saved!');
             }
         } catch (error) {
@@ -228,10 +211,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ========================================
-    // AI CLOTHING DETECTION FUNCTION
+    // LOAD WARDROBE ITEMS FROM POST
     // ========================================
-    async function detectClothing(imageUrl, postData = {}) {
-        // Fetch interaction data first
+    async function loadClothingDetails(imageUrl, postData = {}) {
+        // Fetch interaction data
         let interactionData = {};
         try {
             const encodedUrl = encodeURIComponent(imageUrl);
@@ -246,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Error fetching interactions:', error);
         }
 
-        // Add post info overlay to the image half (LEFT SIDE)
+        // Add post info overlay to the image half
         const existingOverlay = imageHalf.querySelector('.post-info-overlay');
         if (existingOverlay) {
             existingOverlay.remove();
@@ -255,117 +238,56 @@ document.addEventListener("DOMContentLoaded", () => {
         const overlayHTML = createPostInfoOverlay(postData, interactionData);
         imageHalf.insertAdjacentHTML('beforeend', overlayHTML);
 
-        // Show loading state on right side (clothing details)
-        clothingDetails.innerHTML = `
-        <div class="ai-analyzing">
-            <div class="spinner"></div>
-            <span>Analyzing clothing items...</span>
-        </div>
-        `;
-
-        try {
-            const fullImageUrl = imageUrl.startsWith('http') 
-                ? imageUrl 
-                : window.location.origin + imageUrl;
-
-            console.log('🔍 Sending image to AI:', fullImageUrl);
-
-            const response = await fetch('http://localhost:3000/api/detect-clothing', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ imageUrl: fullImageUrl })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('✅ Received detection results:', data);
-            
-            // Remove the loading spinner
-            const spinner = clothingDetails.querySelector('.ai-analyzing');
-            if (spinner) spinner.remove();
-            
-            if (data.success && data.items && data.items.length > 0) {
-                currentItems = data.items;
-                displayClothingItems(data.items);
-            } else {
-                currentItems = [];
-                clothingDetails.innerHTML = `
-                <h2>No Clothing Detected</h2>
-                <p>No clothing items were identified in this image.</p>
-                `;
-            }
-        } catch (error) {
-            console.error('❌ Detection error:', error);
-            currentItems = [];
-            const spinner = clothingDetails.querySelector('.ai-analyzing');
-            if (spinner) spinner.remove();
-            clothingDetails.innerHTML = `
-                <h2>Connection Error</h2>
-                <p>Could not connect to the detection service.</p>
-                <p style="color: #999; font-size: 12px;">Make sure the backend server is running on port 3000.</p>
-                <p style="color: #999; font-size: 12px;">Error: ${error.message}</p>
-            `;
+        // Display wardrobe items if they exist
+        if (postData.wardrobeItems && postData.wardrobeItems.length > 0) {
+            displayClothingItems(postData.wardrobeItems);
+        } else {
+            displayNoItems();
         }
     }
 
-    // Display detected clothing items in a grid layout
     function displayClothingItems(items) {
-        let html = '<h2>Detected Clothing Items</h2>';
+        let html = '<h2>Tagged Items</h2>';
         
-        if (items.length === 0) {
-            html += '<p>No clothing items detected in this image.</p>';
-        } else {
-            html += '<div class="clothing-grid" id="clothingGrid">';
-            items.forEach((item, index) => {
-                html += `
-                <div class="clothing-item" data-item-index="${index}">
-                    <button class="expand-btn" data-index="${index}">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M2 2L6 6M14 2L10 6M2 14L6 10M14 14L10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="clothing-item-header">
-                        <div class="clothing-item-content">
-                            <h3>${item.type}</h3>
-                            <p><strong>Item:</strong> ${item.name}</p>
-                            <p class="brand"><strong>Brand:</strong> ${item.brand}</p>
-                            <p><strong>Color:</strong> ${item.color}</p>
-                            <p><strong>Size:</strong> ${item.size}</p>
-                            <p class="price">${item.price}</p>
-                            ${item.confidence ? `<p style="font-size: 11px; color: #999;">Confidence: ${item.confidence}%</p>` : ''}
-                        </div>
-                        <div class="clothing-item-image">
-                            <img src="${item.image || '/assets/images/icons/placeholder.jpg'}" 
-                                alt="${item.name}" 
-                                onerror="this.src='/assets/images/icons/placeholder.jpg'">
-                        </div>
+        html += '<div class="clothing-grid" id="clothingGrid">';
+        items.forEach((item, index) => {
+            html += `
+            <div class="clothing-item" data-item-index="${index}">
+                <button class="expand-btn" data-index="${index}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M2 2L6 6M14 2L10 6M2 14L6 10M14 14L10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div class="clothing-item-header">
+                    <div class="clothing-item-content">
+                        <h3>${item.category || 'Item'}</h3>
+                        <p><strong>Name:</strong> ${item.name}</p>
+                        <p class="brand"><strong>Brand:</strong> ${item.brand || 'N/A'}</p>
+                        <p><strong>Color:</strong> ${item.color || 'N/A'}</p>
+                        <p><strong>Size:</strong> ${item.size || 'N/A'}</p>
+                        <p class="price">${item.price || 'N/A'}</p>
                     </div>
-                    <div class="expanded-content" style="display: none;">
-                        <p><strong>Material:</strong> ${item.material || 'Cotton blend'}</p>
-                        <p><strong>Condition:</strong> ${item.condition || 'New with tags'}</p>
-                        <p><strong>Style Code:</strong> ${item.styleCode || 'N/A'}</p>
-                        <p><strong>Description:</strong> ${item.description || 'A versatile piece perfect for any occasion.'}</p>
-                        <div class="action-buttons">
-                            <button class="btn-find-replacements" data-index="${index}">Find Replacements</button>
-                            <button class="btn-add-wishlist" data-index="${index}">Add to Wishlist</button>
-                            <button class="btn-add-pieces" data-index="${index}">Add to Your Pieces</button>
-                        </div>
+                    <div class="clothing-item-image">
+                        <img src="${item.image || '/assets/images/icons/placeholder.jpg'}" 
+                            alt="${item.name}" 
+                            onerror="this.src='/assets/images/icons/placeholder.jpg'">
                     </div>
                 </div>
-                `;
-            });
-            html += '</div>';
-        }
+                <div class="expanded-content" style="display: none;">
+                    <p><strong>From:</strong> User's wardrobe</p>
+                    <div class="action-buttons">
+                        <button class="btn-add-wishlist" data-index="${index}">Add to Wishlist</button>
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+        html += '</div>';
 
         html += `
         <div class="info-section">
-            <h2>About This Detection</h2>
-            <p>These items were detected using AI image recognition technology. Results may vary based on image quality.</p>
+            <h2>About These Items</h2>
+            <p>These items were tagged by the user from their wardrobe.</p>
         </div>
         `;
 
@@ -381,146 +303,60 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Add click handlers for action buttons
-        const findReplacementsBtns = clothingDetails.querySelectorAll('.btn-find-replacements');
-        findReplacementsBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const index = parseInt(btn.dataset.index);
-                handleFindReplacements(currentItems[index]);
-            });
-        });
-
-        const addPiecesBtns = clothingDetails.querySelectorAll('.btn-add-pieces');
-        addPiecesBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const index = parseInt(btn.dataset.index);
-                handleAddToPieces(currentItems[index], btn);
-            });
-        });
-
+        // Add click handlers for wishlist buttons
         const addWishlistBtns = clothingDetails.querySelectorAll('.btn-add-wishlist');
         addWishlistBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const index = parseInt(btn.dataset.index);
-                handleAddWishlist(currentItems[index], btn);
+                handleAddWishlist(items[index], btn);
             });
         });
     }
 
-    function handleFindReplacements(item) {
-        alert(`Finding replacements for ${item.name}...`);
-    }
-
-    async function handleAddToPieces(item, button) {
-        try {
-            const pieceData = {
-                name: item.name || "Unnamed item",
-                type: item.type || "Unknown",
-                brand: item.brand || "",
-                color: item.color || "",
-                size: item.size || "",
-                price: item.price || "",
-                image: item.image || "",
-                category: item.category || "misc",
-                notes: item.notes || "",
-                sourceImage: images[currentIndex]?.src || ""
-            };
-
-            const res = await fetch("http://localhost:3000/api/putons", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(pieceData)
-            });
-
-            const text = await res.text();
-            console.log("📥 Raw response (pieces):", text);
-
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch {
-                throw new Error("Invalid JSON response (probably HTML)");
-            }
-
-            if (data.success) {
-                console.log("✅ Added to Your Pieces:", data);
-                showNotification("Item added to Your Pieces!");
-
-                const originalWidth = button.offsetWidth;
-                const originalHeight = button.offsetHeight;
-
-                button.textContent = "✓ Added!";
-                button.style.background = "#4CAF50";
-                button.style.width = `${originalWidth}px`;
-                button.style.height = `${originalHeight}px`;
-                button.disabled = true;
-
-                setTimeout(() => {
-                    button.textContent = "Add to Your Pieces";
-                    button.style.background = "";
-                    button.disabled = false;
-                }, 2000);
-            } else if (res.status === 401) {
-                alert("Please log in to save pieces.");
-            } else {
-                console.error("❌ Failed to add piece:", data.message);
-                showNotification("Failed to save piece.", "error");
-            }
-
-        } catch (err) {
-            console.error("❌ Error adding piece:", err);
-            showNotification("Error saving piece. Please try again.", "error");
-        }
+    function displayNoItems() {
+        clothingDetails.innerHTML = `
+            <h2>Outfit Details</h2>
+            <p>No items have been tagged in this post.</p>
+        `;
     }
 
     async function handleAddWishlist(item) {
         try {
             const wishlistItem = {
                 name: item.name || "Unnamed item",
-                type: item.type || "Unknown",
+                type: item.category || "Unknown",
                 brand: item.brand || "",
                 color: item.color || "",
                 size: item.size || "",
                 price: item.price || "",
                 image: item.image || "",
                 category: item.category || "misc",
-                notes: item.notes || ""
+                notes: ""
             };
 
-            const res = await fetch("http://localhost:3000/api/wishlist", {
+            const res = await fetch("/api/wishlist", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(wishlistItem),
                 credentials: "include"
             });
 
-            const text = await res.text();
-            console.log("📥 Raw wishlist response:", text);
-
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch {
-                throw new Error("Invalid JSON response (probably HTML)");
-            }
+            const data = await res.json();
 
             if (data.success) {
                 console.log("✅ Added to wishlist:", data.item);
-                alert("Added to wishlist!");
+                showNotification("Added to wishlist!");
             } else if (res.status === 401) {
                 alert("Please log in to add items to your wishlist.");
             } else {
                 console.error("❌ Failed to add to wishlist:", data.message);
-                alert("Error adding to wishlist.");
+                showNotification("Error adding to wishlist.", "error");
             }
 
         } catch (err) {
             console.error("❌ Error adding to wishlist:", err);
-            alert("Error adding to wishlist.");
+            showNotification("Error adding to wishlist.", "error");
         }
     }
 
@@ -584,9 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Get image data by URL
     function getImageData(imageUrl) {
-        // Try to find matching image data from the loaded JSON
         const relativePath = imageUrl.replace(window.location.origin, '');
         return imagesData.find(img => img.url === relativePath) || {
             url: relativePath,
@@ -596,11 +430,11 @@ document.addEventListener("DOMContentLoaded", () => {
             userName: 'Anonymous User',
             Gender: [],
             Style: [],
-            Season: []
+            Season: [],
+            wardrobeItems: []
         };
     }
 
-    // Load images data from JSON
     async function loadImagesData() {
         try {
             const response = await fetch('/data/images.json');
@@ -612,10 +446,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Initialize images data
     loadImagesData();
 
-    // Wait for dynamically loaded images
     const observer = new MutationObserver(() => {
         images = Array.from(gallery.querySelectorAll("img"));
         images.forEach((img, index) => {
@@ -624,7 +456,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     observer.observe(gallery, { childList: true, subtree: true });
 
-    // Fallback if images already exist
     setTimeout(() => {
         images = Array.from(gallery.querySelectorAll("img"));
         images.forEach((img, index) => {
@@ -673,9 +504,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
         
-        // Get post data and run detection
         const postData = getImageData(images[currentIndex].src);
-        detectClothing(images[currentIndex].src, postData);
+        loadClothingDetails(images[currentIndex].src, postData);
         
         imageInfoScreen.classList.add("active");
         overlay.classList.add("active");
@@ -695,7 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
             reel.style.transform = `translateY(-${currentIndex * 100}%)`;
             
             const postData = getImageData(images[currentIndex].src);
-            detectClothing(images[currentIndex].src, postData);
+            loadClothingDetails(images[currentIndex].src, postData);
             
             setTimeout(() => {
                 isScrolling = false;
@@ -716,7 +546,7 @@ document.addEventListener("DOMContentLoaded", () => {
             reel.style.transform = `translateY(-${currentIndex * 100}%)`;
             
             const postData = getImageData(images[currentIndex].src);
-            detectClothing(images[currentIndex].src, postData);
+            loadClothingDetails(images[currentIndex].src, postData);
             
             setTimeout(() => {
                 isScrolling = false;
@@ -724,7 +554,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Scroll wheel navigation
     imageHalf.addEventListener("wheel", (e) => {
         if (!imageInfoScreen.classList.contains("active")) return;
         e.preventDefault();
@@ -732,7 +561,6 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (e.deltaY < 0) showPrevImage();
     });
 
-    // Arrow key navigation
     document.addEventListener("keydown", (e) => {
         if (!imageInfoScreen.classList.contains("active")) return;
         if (e.key === "ArrowRight" || e.key === "ArrowDown") showNextImage();

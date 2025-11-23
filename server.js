@@ -356,6 +356,11 @@ let db;
         name TEXT,
         category TEXT,
         image TEXT,
+        brand TEXT,
+        color TEXT,
+        size TEXT,
+        price TEXT,
+        material TEXT,
         addedDate TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id)
       );
@@ -987,16 +992,27 @@ app.post('/api/posts', requireLogin, upload.single('image'), async (req, res) =>
       return res.status(400).json({ success: false, message: 'No image uploaded' });
     }
 
-    const { caption, gender, style, season } = req.body;
+    const { caption, gender, style, season, wardrobeItems } = req.body;
     
     const genderTags = gender ? JSON.parse(gender) : [];
     const styleTags = style ? JSON.parse(style) : [];
     const seasonTags = season ? JSON.parse(season) : [];
+    const wardrobeItemIds = wardrobeItems ? JSON.parse(wardrobeItems) : [];
 
     const imageUrl = `/assets/images/outfits/user-posts/${req.file.filename}`;
 
     // Get user info including profile picture
-    const user = await db.get('SELECT name, profile_picture FROM users WHERE id = ?', [req.session.userId]);
+    const user = await db.get('SELECT name, username, profile_picture FROM users WHERE id = ?', [req.session.userId]);
+
+    // Get full wardrobe item details
+    let wardrobeItemsData = [];
+    if (wardrobeItemIds.length > 0) {
+      const placeholders = wardrobeItemIds.map(() => '?').join(',');
+      wardrobeItemsData = await db.all(
+        `SELECT id, name, category, brand, color, size, price, image FROM wardrobe WHERE id IN (${placeholders}) AND user_id = ?`,
+        [...wardrobeItemIds, req.session.userId]
+      );
+    }
 
     const imagesJsonPath = path.join(DATA, 'images.json');
     let imagesData = [];
@@ -1011,15 +1027,16 @@ app.post('/api/posts', requireLogin, upload.single('image'), async (req, res) =>
 
     const newEntry = {
       url: imageUrl,
-      page: ["user-posts"],
+      caption: caption || '',
+      timestamp: new Date().toISOString(),
+      userId: req.session.userId,
+      userName: user.username || user.name,
+      userProfilePic: user.profile_picture,
+      page: ["fyp"],
       Gender: genderTags,
       Style: styleTags,
       Season: seasonTags,
-      caption: caption || '',
-      userId: req.session.userId,
-      userName: user.name,
-      userProfilePic: user.profile_picture, // Add this!
-      timestamp: new Date().toISOString()
+      wardrobeItems: wardrobeItemsData // Add full wardrobe item details
     };
 
     imagesData.push(newEntry);
@@ -1505,7 +1522,7 @@ app.delete("/api/wishlist/:id", requireLogin, async (req, res) => {
 // Add new item
 app.post("/api/wardrobe", requireLogin, async (req, res) => {
   try {
-    const { name, category, image } = req.body;
+    const { name, category, image, brand, color, size, price, material } = req.body;
     const userId = req.session.userId;
 
     if (!name || !image || !category) {
@@ -1515,19 +1532,68 @@ app.post("/api/wardrobe", requireLogin, async (req, res) => {
     const addedDate = new Date().toISOString();
 
     const result = await db.run(
-      `INSERT INTO wardrobe (user_id, name, category, image, addedDate)
-       VALUES (?, ?, ?, ?, ?)`,
-      [userId, name, category, image, addedDate]
+      `INSERT INTO wardrobe (user_id, name, category, image, brand, color, size, price, material, addedDate)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [userId, name, category, image, brand || '', color || '', size || '', price || '', material || '', addedDate]
     );
 
     res.json({
       success: true,
       message: "Item added to wardrobe!",
-      item: { id: result.lastID, name, category, image, addedDate }
+      item: { 
+        id: result.lastID, 
+        name, 
+        category, 
+        image, 
+        brand, 
+        color, 
+        size, 
+        price, 
+        material, 
+        addedDate 
+      }
     });
   } catch (err) {
     console.error("❌ Error adding wardrobe item:", err);
     res.status(500).json({ success: false, message: "Failed to add wardrobe item" });
+  }
+});
+
+app.put("/api/wardrobe/:id", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const itemId = req.params.id;
+    const { name, category, brand, color, size, price, material } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ success: false, message: "Item name is required" });
+    }
+
+    // Verify the item belongs to the user
+    const existingItem = await db.get(
+      "SELECT id FROM wardrobe WHERE id = ? AND user_id = ?",
+      [itemId, userId]
+    );
+
+    if (!existingItem) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    await db.run(
+      `UPDATE wardrobe 
+       SET name = ?, category = ?, brand = ?, color = ?, size = ?, price = ?, material = ?
+       WHERE id = ? AND user_id = ?`,
+      [name, category || '', brand || '', color || '', size || '', price || '', material || '', itemId, userId]
+    );
+
+    res.json({
+      success: true,
+      message: "Item updated successfully!",
+      item: { id: parseInt(itemId), name, category, brand, color, size, price, material }
+    });
+  } catch (err) {
+    console.error("❌ Error updating wardrobe item:", err);
+    res.status(500).json({ success: false, message: "Failed to update wardrobe item" });
   }
 });
 

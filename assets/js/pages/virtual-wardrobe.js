@@ -4,14 +4,27 @@ let outfits = [];
 let currentView = 'items';
 let currentAddMethod = 'upload';
 let imagePreview = '';
+let currentDetailsItemId = null; // Track which item is being viewed/edited
 
 const categories = ['tops', 'bottoms', 'dresses', 'outerwear', 'shoes', 'accessories'];
+
+// Combo field mappings
+const comboFields = [
+  { select: 'brand-select', custom: 'brand-custom' },
+  { select: 'color-select', custom: 'color-custom' },
+  { select: 'size-select', custom: 'size-custom' },
+  { select: 'price-select', custom: 'price-custom' },
+  { select: 'material-select', custom: 'material-custom' }
+];
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   loadItems();
   loadOutfits();
   initEventListeners();
+  initComboSelects();
+  initSectionTabs();
+  initDetailsModal();
 });
 
 // Event Listeners
@@ -45,9 +58,11 @@ function initEventListeners() {
     if (e.target.id === 'add-modal') closeModal();
   });
 
-  // Event delegation for delete buttons
+  // Event delegation for delete buttons and view details
   document.addEventListener('click', (e) => {
     const deleteBtn = e.target.closest('.delete-btn');
+    const viewDetailsBtn = e.target.closest('.view-details-btn');
+    
     if (deleteBtn) {
       const itemId = deleteBtn.getAttribute('data-item-id');
       const outfitId = deleteBtn.getAttribute('data-outfit-id');
@@ -58,13 +73,215 @@ function initEventListeners() {
         deleteOutfit(outfitId);
       }
     }
+    
+    if (viewDetailsBtn) {
+      const itemId = viewDetailsBtn.getAttribute('data-item-id');
+      if (itemId) {
+        openDetailsModal(parseInt(itemId));
+      }
+    }
   });
+}
+
+// Initialize Details Modal
+function initDetailsModal() {
+  const modal = document.getElementById('item-details-modal');
+  const closeBtn = document.getElementById('close-details-modal-btn');
+  const editBtn = document.getElementById('edit-details-btn');
+  const saveBtn = document.getElementById('save-details-btn');
+  const cancelBtn = document.getElementById('cancel-edit-btn');
+  
+  // Close modal
+  closeBtn.addEventListener('click', closeDetailsModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target.id === 'item-details-modal') closeDetailsModal();
+  });
+  
+  // Edit button
+  editBtn.addEventListener('click', () => {
+    switchToEditMode();
+  });
+  
+  // Save button
+  saveBtn.addEventListener('click', saveItemDetails);
+  
+  // Cancel edit button
+  cancelBtn.addEventListener('click', () => {
+    switchToViewMode();
+    populateDetailsModal(currentDetailsItemId); // Reset to original values
+  });
+}
+
+// Open details modal
+function openDetailsModal(itemId) {
+  currentDetailsItemId = itemId;
+  const modal = document.getElementById('item-details-modal');
+  
+  populateDetailsModal(itemId);
+  switchToViewMode();
+  modal.classList.remove('hidden');
+}
+
+// Close details modal
+function closeDetailsModal() {
+  document.getElementById('item-details-modal').classList.add('hidden');
+  currentDetailsItemId = null;
+  switchToViewMode();
+}
+
+// Populate details modal with item data
+function populateDetailsModal(itemId) {
+  const item = items.find(i => i.id === itemId);
+  if (!item) return;
+  
+  // Set image
+  document.getElementById('details-modal-image').src = item.image;
+  document.getElementById('details-modal-title').textContent = item.name || 'Item Details';
+  
+  // View mode values
+  document.getElementById('view-name').textContent = item.name || '-';
+  document.getElementById('view-category').textContent = item.category || '-';
+  document.getElementById('view-brand').textContent = item.brand || '-';
+  document.getElementById('view-color').textContent = item.color || '-';
+  document.getElementById('view-size').textContent = item.size || '-';
+  document.getElementById('view-price').textContent = item.price || '-';
+  document.getElementById('view-material').textContent = item.material || '-';
+  
+  // Edit mode values
+  document.getElementById('edit-name').value = item.name || '';
+  document.getElementById('edit-category').value = item.category || 'tops';
+  document.getElementById('edit-brand').value = item.brand || '';
+  document.getElementById('edit-color').value = item.color || '';
+  document.getElementById('edit-size').value = item.size || '';
+  document.getElementById('edit-price').value = item.price || '';
+  document.getElementById('edit-material').value = item.material || '';
+}
+
+// Switch to view mode
+function switchToViewMode() {
+  document.getElementById('details-view-mode').classList.remove('hidden');
+  document.getElementById('details-edit-mode').classList.add('hidden');
+  document.getElementById('edit-details-btn').classList.remove('hidden');
+  document.getElementById('save-details-btn').classList.add('hidden');
+  document.getElementById('cancel-edit-btn').classList.add('hidden');
+}
+
+// Switch to edit mode
+function switchToEditMode() {
+  document.getElementById('details-view-mode').classList.add('hidden');
+  document.getElementById('details-edit-mode').classList.remove('hidden');
+  document.getElementById('edit-details-btn').classList.add('hidden');
+  document.getElementById('save-details-btn').classList.remove('hidden');
+  document.getElementById('cancel-edit-btn').classList.remove('hidden');
+}
+
+// Save item details
+async function saveItemDetails() {
+  if (!currentDetailsItemId) return;
+  
+  const updatedItem = {
+    name: document.getElementById('edit-name').value.trim(),
+    category: document.getElementById('edit-category').value,
+    brand: document.getElementById('edit-brand').value.trim(),
+    color: document.getElementById('edit-color').value.trim(),
+    size: document.getElementById('edit-size').value.trim(),
+    price: document.getElementById('edit-price').value.trim(),
+    material: document.getElementById('edit-material').value.trim()
+  };
+  
+  if (!updatedItem.name) {
+    alert('Item name is required');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`/api/wardrobe/${currentDetailsItemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updatedItem)
+    });
+    
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    
+    // Update local items array
+    const index = items.findIndex(i => i.id === currentDetailsItemId);
+    if (index !== -1) {
+      items[index] = { ...items[index], ...updatedItem };
+    }
+    
+    // Update modal display
+    populateDetailsModal(currentDetailsItemId);
+    switchToViewMode();
+    renderCurrentView();
+    
+    console.log('✅ Updated item:', currentDetailsItemId);
+  } catch (error) {
+    console.error('❌ Error updating item:', error);
+    alert('Failed to update item.');
+  }
+}
+
+// Initialize Section Tabs (Item Details / Item Name)
+function initSectionTabs() {
+  const detailsTab = document.getElementById('details-tab');
+  const nameTab = document.getElementById('name-tab');
+  const detailsSection = document.getElementById('details-section');
+  const nameSection = document.getElementById('name-section');
+
+  detailsTab.addEventListener('click', () => {
+    detailsTab.classList.add('active');
+    nameTab.classList.remove('active');
+    detailsSection.classList.remove('hidden');
+    nameSection.classList.add('hidden');
+  });
+
+  nameTab.addEventListener('click', () => {
+    nameTab.classList.add('active');
+    detailsTab.classList.remove('active');
+    nameSection.classList.remove('hidden');
+    detailsSection.classList.add('hidden');
+  });
+}
+
+// Initialize Combo Selects (dropdown + custom input)
+function initComboSelects() {
+  comboFields.forEach(field => {
+    const select = document.getElementById(field.select);
+    const custom = document.getElementById(field.custom);
+    
+    if (select && custom) {
+      select.addEventListener('change', () => {
+        if (select.value === 'Other') {
+          custom.classList.remove('hidden');
+          custom.focus();
+        } else {
+          custom.classList.add('hidden');
+          custom.value = '';
+        }
+      });
+    }
+  });
+}
+
+// Helper function to get combo field value
+function getComboValue(selectId, customId) {
+  const select = document.getElementById(selectId);
+  const custom = document.getElementById(customId);
+  
+  if (!select) return '';
+  
+  if (select.value === 'Other' && custom && custom.value.trim()) {
+    return custom.value.trim();
+  }
+  return select.value || '';
 }
 
 // Load items from storage
 async function loadItems() {
   try {
-    const res = await fetch('http://localhost:3000/api/wardrobe', {
+    const res = await fetch('/api/wardrobe', {
       method: 'GET',
       credentials: 'include'
     });
@@ -82,7 +299,7 @@ async function loadItems() {
 // Load outfits from the database
 async function loadOutfits() {
   try {
-    const res = await fetch('http://localhost:3000/api/outfits', {
+    const res = await fetch('/api/outfits', {
       method: 'GET',
       credentials: 'include'
     });
@@ -168,6 +385,10 @@ function renderItems() {
           <button class="delete-btn" data-item-id="${item.id}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
+          <button class="view-details-btn" data-item-id="${item.id}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            View Details
+          </button>
         </div>
         <div class="item-info">
           <p class="item-name">${item.name}</p>
@@ -230,6 +451,7 @@ function renderOutfits() {
 
 // Modal functions
 function openModal() {
+  resetModal();
   document.getElementById('add-modal').classList.remove('hidden');
 }
 
@@ -239,12 +461,42 @@ function closeModal() {
 }
 
 function resetModal() {
+  // Reset image inputs
   document.getElementById('file-input').value = '';
   document.getElementById('url-text-input').value = '';
+  document.getElementById('image-preview').classList.add('hidden');
+  document.getElementById('preview-img').src = '';
+  imagePreview = '';
+  
+  // Reset name section
   document.getElementById('item-name-input').value = '';
   document.getElementById('category-input').value = 'tops';
-  document.getElementById('image-preview').classList.add('hidden');
-  imagePreview = '';
+  
+  // Reset details section - combo fields
+  comboFields.forEach(field => {
+    const select = document.getElementById(field.select);
+    const custom = document.getElementById(field.custom);
+    if (select) select.value = '';
+    if (custom) {
+      custom.value = '';
+      custom.classList.add('hidden');
+    }
+  });
+  
+  // Reset section tabs to Item Details
+  const detailsTab = document.getElementById('details-tab');
+  const nameTab = document.getElementById('name-tab');
+  const detailsSection = document.getElementById('details-section');
+  const nameSection = document.getElementById('name-section');
+  
+  if (detailsTab && nameTab && detailsSection && nameSection) {
+    detailsTab.classList.add('active');
+    nameTab.classList.remove('active');
+    detailsSection.classList.remove('hidden');
+    nameSection.classList.add('hidden');
+  }
+  
+  // Reset method tabs
   switchAddMethod('upload');
 }
 
@@ -292,7 +544,6 @@ function resizeImage(file, maxWidth, maxHeight, quality) {
         let width = img.width;
         let height = img.height;
 
-        // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
           if (width > maxWidth) {
             height = height * (maxWidth / width);
@@ -310,7 +561,6 @@ function resizeImage(file, maxWidth, maxHeight, quality) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to base64 with compression
         const resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
         resolve(resizedDataUrl);
       };
@@ -340,20 +590,39 @@ function showImagePreview(src) {
 async function addItem() {
   const itemName = document.getElementById('item-name-input').value.trim();
   const category = document.getElementById('category-input').value;
+  
+  // Get item details from combo fields
+  const brand = getComboValue('brand-select', 'brand-custom');
+  const color = getComboValue('color-select', 'color-custom');
+  const size = getComboValue('size-select', 'size-custom');
+  const price = getComboValue('price-select', 'price-custom');
+  const material = getComboValue('material-select', 'material-custom');
 
-  if (!itemName || !imagePreview) {
-    alert('Please provide an item name and image');
+  if (!itemName) {
+    alert('Please provide an item name');
+    // Switch to name tab
+    document.getElementById('name-tab').click();
+    return;
+  }
+  
+  if (!imagePreview) {
+    alert('Please provide an image');
     return;
   }
 
   const newItem = {
     name: itemName,
     category: category,
-    image: imagePreview
+    image: imagePreview,
+    brand: brand,
+    color: color,
+    size: size,
+    price: price,
+    material: material
   };
 
   try {
-    const res = await fetch('http://localhost:3000/api/wardrobe', {
+    const res = await fetch('/api/wardrobe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -378,7 +647,7 @@ async function deleteItem(id) {
   if (!confirm('Are you sure you want to delete this item?')) return;
 
   try {
-    const res = await fetch(`http://localhost:3000/api/wardrobe/${id}`, {
+    const res = await fetch(`/api/wardrobe/${id}`, {
       method: 'DELETE',
       credentials: 'include'
     });
@@ -386,7 +655,7 @@ async function deleteItem(id) {
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
 
-    items = items.filter(item => item.id !== id);
+    items = items.filter(item => item.id !== parseInt(id));
     renderCurrentView();
     console.log('🗑️ Deleted item from database:', id);
   } catch (error) {
@@ -400,7 +669,7 @@ async function deleteOutfit(id) {
   if (!confirm('Are you sure you want to delete this outfit?')) return;
 
   try {
-    const res = await fetch(`http://localhost:3000/api/outfits/${id}`, {
+    const res = await fetch(`/api/outfits/${id}`, {
       method: 'DELETE',
       credentials: 'include'
     });
@@ -408,7 +677,7 @@ async function deleteOutfit(id) {
     const data = await res.json();
     if (!data.success) throw new Error(data.message);
 
-    outfits = outfits.filter(outfit => outfit.id !== id);
+    outfits = outfits.filter(outfit => outfit.id !== parseInt(id));
     renderCurrentView();
     console.log('🗑️ Deleted outfit from database:', id);
   } catch (error) {
