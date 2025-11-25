@@ -95,14 +95,14 @@ html, body {
 }
 
 .filter-side-bar:not(.collapsed) ~ .filter-toggle-btn {
-    left: 145px; /* Adjust based on your sidebar width */
+    left: 170px; /* Adjust based on your sidebar width */
     border-radius: 8px;
 }
 
 .filter-toggle-btn {
     position: fixed;
     left: 0;
-    top: 11.5%;
+    top: 11%;
     transform: translateY(-50%);
     background: #333;
     color: white;
@@ -629,8 +629,11 @@ html, body {
     position: absolute;
     align-items: center;
     gap: 8px;
-    bottom: -55px;
+    bottom: -55px;  /* This is the problem - it's outside the parent */
     left: 10px;
+    pointer-events: auto;  /* Add this explicitly */
+    cursor: pointer;  /* Add this to show it's clickable */
+    z-index: 10;  /* Make sure it's above other elements */
 }
 
 .post-author-avatar-overlay {

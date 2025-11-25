@@ -511,9 +511,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 12px;
     opacity: 0;
     transition: opacity 0.3s;
     backdrop-filter: blur(4px);
+}
+
+.edit-post-btn:hover {
+    background: rgba(25, 118, 210, 1) !important;
+    transform: scale(1.1);
+}
+
+.edit-post-btn:active {
+    transform: scale(0.95);
 }
 
 .post-item:hover .post-overlay {
@@ -709,4 +719,401 @@ body {
 .view-profile-btn svg {
     width: 16px;
     height: 16px;
+}
+
+/* Edit Post Modal Styles */
+.edit-post-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.edit-post-modal.active {
+    display: flex;
+}
+
+.edit-post-modal .modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.edit-post-modal .modal-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.edit-post-modal .modal-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.edit-post-modal .close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.edit-post-modal .close-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.edit-post-modal .modal-body {
+    padding: 32px;
+}
+
+.edit-post-modal .post-preview {
+    width: 100%;
+    max-height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: #000;
+}
+
+.edit-post-modal .post-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.edit-post-modal .form-section {
+    margin-bottom: 24px;
+}
+
+.edit-post-modal .form-section label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.edit-post-modal .form-section textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+}
+
+.edit-post-modal .form-section textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.edit-post-modal .tags-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.edit-post-modal .tag-category {
+    margin-bottom: 16px;
+}
+
+.edit-post-modal .tag-category h4 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.edit-post-modal .tag-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.edit-post-modal .tag-option {
+    padding: 8px 16px;
+    border: 1px solid #d0d0d0;
+    border-radius: 20px;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.edit-post-modal .tag-option:hover {
+    border-color: #999;
+    background: #f9f9f9;
+}
+
+.edit-post-modal .tag-option.selected {
+    background: #000;
+    color: white;
+    border-color: #000;
+}
+
+.edit-post-modal .wardrobe-section-edit {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.edit-post-modal .wardrobe-section-edit h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.edit-post-modal .wardrobe-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.edit-post-modal .wardrobe-item {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.edit-post-modal .wardrobe-item:hover {
+    border-color: #999;
+    transform: translateY(-2px);
+}
+
+.edit-post-modal .wardrobe-item.selected {
+    border-color: #000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.edit-post-modal .wardrobe-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+}
+
+.edit-post-modal .wardrobe-item-name {
+    padding: 6px;
+    font-size: 10px;
+    color: #333;
+    text-align: center;
+    background: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.edit-post-modal .wardrobe-item .check-mark {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background: #000;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.edit-post-modal .wardrobe-item.selected .check-mark {
+    display: flex;
+}
+
+.edit-post-modal .modal-footer {
+    padding: 20px 32px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+.edit-post-modal .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.edit-post-modal .btn-cancel {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.edit-post-modal .btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.edit-post-modal .btn-save {
+    background: #000;
+    color: white;
+}
+
+.edit-post-modal .btn-save:hover {
+    background: #333;
+}
+
+.edit-post-modal .btn-save:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.edit-post-modal .loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.edit-post-modal .loading.active {
+    display: block;
+}
+
+.edit-post-modal .loading .spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #333;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin-modal 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin-modal {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Edit button styles */
+.edit-post-btn {
+    background: rgba(33, 150, 243, 0.9);
+    border: 2px solid white;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.edit-post-btn:hover {
+    background: rgba(25, 118, 210, 1);
+    transform: scale(1.1);
+}
+
+.edit-post-btn:active {
+    transform: scale(0.95);
+}
+
+.edit-post-btn svg {
+    stroke: white;
+}
+
+/* Update post overlay to show both buttons */
+.post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(4px);
+}
+
+@media (max-width: 768px) {
+    .edit-post-modal .modal-content {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .edit-post-modal .modal-header {
+        padding: 16px 20px;
+    }
+
+    .edit-post-modal .modal-body {
+        padding: 20px;
+    }
+
+    .edit-post-modal .modal-footer {
+        padding: 16px 20px;
+    }
+
+    .edit-post-modal .wardrobe-items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
 }

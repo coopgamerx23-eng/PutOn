@@ -307,6 +307,81 @@
         </div>
     </div>
 
+    <!-- Edit Post Modal -->
+    <div class="edit-post-modal" id="editPostModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Post</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="loading" id="editLoading">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+
+                <div id="editFormContent" style="display: none;">
+                    <div class="post-preview">
+                        <img id="editPostImage" src="" alt="Post preview">
+                    </div>
+
+                    <div class="wardrobe-section-edit">
+                        <h3>Tagged Wardrobe Items</h3>
+                        <div class="wardrobe-items-grid" id="editWardrobeGrid">
+                            <!-- Wardrobe items will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="editCaption">Caption</label>
+                        <textarea id="editCaption" placeholder="Describe your outfit..."></textarea>
+                    </div>
+
+                    <div class="tags-section">
+                        <h3>Style Tags</h3>
+                        
+                        <div class="tag-category">
+                            <h4>Gender</h4>
+                            <div class="tag-options" id="editGenderTags">
+                                <div class="tag-option" data-tag="Men">Men</div>
+                                <div class="tag-option" data-tag="Women">Women</div>
+                            </div>
+                        </div>
+
+                        <div class="tag-category">
+                            <h4>Style</h4>
+                            <div class="tag-options" id="editStyleTags">
+                                <div class="tag-option" data-tag="Streetwear">Streetwear</div>
+                                <div class="tag-option" data-tag="Date night">Date Night</div>
+                                <div class="tag-option" data-tag="Beach">Beach</div>
+                                <div class="tag-option" data-tag="Stockholm">Stockholm</div>
+                                <div class="tag-option" data-tag="Old money">Old Money</div>
+                                <div class="tag-option" data-tag="Gymwear">Gymwear</div>
+                                <div class="tag-option" data-tag="Comfortable">Comfortable</div>
+                            </div>
+                        </div>
+
+                        <div class="tag-category">
+                            <h4>Season</h4>
+                            <div class="tag-options" id="editSeasonTags">
+                                <div class="tag-option" data-tag="Winter">Winter</div>
+                                <div class="tag-option" data-tag="Spring">Spring</div>
+                                <div class="tag-option" data-tag="Summer">Summer</div>
+                                <div class="tag-option" data-tag="Fall">Fall</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="btn btn-save" id="saveEditBtn" onclick="savePostEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <div id="create-account-page-placeholder"></div>
 
     <script type="module" src="/assets/js/pages/page-defaults.js"></script>

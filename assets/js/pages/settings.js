@@ -192,6 +192,12 @@ async function loadUserPosts() {
                     <div class="post-item">
                         <img src="${post.url}" alt="${post.caption || 'User post'}">
                         <div class="post-overlay">
+                            <button class="edit-post-btn" onclick="event.stopPropagation(); openEditModal('${post.url}')" style="background: rgba(33, 150, 243, 0.9); border: 2px solid white; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); margin-right: 12px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
                             <button class="delete-post-btn" onclick="deletePost('${post.url}', this)">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
@@ -609,4 +615,255 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+});
+
+let currentEditingPost = null;
+let allWardrobeItems = [];
+let selectedWardrobeItemIds = [];
+let selectedEditTags = {
+    gender: [],
+    style: [],
+    season: []
+};
+
+// Open edit modal
+window.openEditModal = async function(postUrl) {
+    const modal = document.getElementById('editPostModal');
+    const loading = document.getElementById('editLoading');
+    const formContent = document.getElementById('editFormContent');
+    
+    modal.classList.add('active');
+    loading.classList.add('active');
+    formContent.style.display = 'none';
+    
+    try {
+        // Load post data from images.json
+        const response = await fetch('/data/images.json');
+        const imagesData = await response.json();
+        const postData = imagesData.find(img => img.url === postUrl);
+        
+        if (!postData) {
+            throw new Error('Post not found');
+        }
+        
+        currentEditingPost = postData;
+        
+        // Load wardrobe items
+        const wardrobeResponse = await fetch('/api/wardrobe', {
+            credentials: 'include'
+        });
+        const wardrobeData = await wardrobeResponse.json();
+        
+        if (wardrobeData.success) {
+            allWardrobeItems = wardrobeData.items;
+        }
+        
+        // Populate form
+        document.getElementById('editPostImage').src = postData.url;
+        document.getElementById('editCaption').value = postData.caption || '';
+        
+        // Set selected tags
+        selectedEditTags = {
+            gender: postData.Gender || [],
+            style: postData.Style || [],
+            season: postData.Season || []
+        };
+        
+        // Set selected wardrobe items
+        selectedWardrobeItemIds = (postData.wardrobeItems || []).map(item => item.id);
+        
+        // Update UI
+        updateTagsUI();
+        displayEditWardrobeItems();
+        
+        loading.classList.remove('active');
+        formContent.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error loading post data:', error);
+        alert('Failed to load post data');
+        closeEditModal();
+    }
+};
+
+// Close modal
+window.closeEditModal = function() {
+    const modal = document.getElementById('editPostModal');
+    modal.classList.remove('active');
+    currentEditingPost = null;
+    selectedWardrobeItemIds = [];
+    selectedEditTags = { gender: [], style: [], season: [] };
+};
+
+// Display wardrobe items
+function displayEditWardrobeItems() {
+    const grid = document.getElementById('editWardrobeGrid');
+    
+    if (allWardrobeItems.length === 0) {
+        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No wardrobe items available</p>';
+        return;
+    }
+    
+    grid.innerHTML = allWardrobeItems.map(item => `
+        <div class="wardrobe-item ${selectedWardrobeItemIds.includes(item.id) ? 'selected' : ''}" 
+             data-id="${item.id}" 
+             onclick="toggleWardrobeItemEdit(${item.id})">
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='/assets/images/icons/placeholder.jpg'">
+            <div class="wardrobe-item-name">${item.name}</div>
+            <div class="check-mark">✓</div>
+        </div>
+    `).join('');
+}
+
+// Toggle wardrobe item selection
+window.toggleWardrobeItemEdit = function(itemId) {
+    const index = selectedWardrobeItemIds.indexOf(itemId);
+    const itemElement = document.querySelector(`#editWardrobeGrid .wardrobe-item[data-id="${itemId}"]`);
+    
+    if (index > -1) {
+        selectedWardrobeItemIds.splice(index, 1);
+        itemElement.classList.remove('selected');
+    } else {
+        selectedWardrobeItemIds.push(itemId);
+        itemElement.classList.add('selected');
+    }
+};
+
+// Update tags UI
+function updateTagsUI() {
+    // Gender tags
+    document.querySelectorAll('#editGenderTags .tag-option').forEach(tag => {
+        const tagValue = tag.dataset.tag;
+        if (selectedEditTags.gender.includes(tagValue)) {
+            tag.classList.add('selected');
+        } else {
+            tag.classList.remove('selected');
+        }
+    });
+    
+    // Style tags
+    document.querySelectorAll('#editStyleTags .tag-option').forEach(tag => {
+        const tagValue = tag.dataset.tag;
+        if (selectedEditTags.style.includes(tagValue)) {
+            tag.classList.add('selected');
+        } else {
+            tag.classList.remove('selected');
+        }
+    });
+    
+    // Season tags
+    document.querySelectorAll('#editSeasonTags .tag-option').forEach(tag => {
+        const tagValue = tag.dataset.tag;
+        if (selectedEditTags.season.includes(tagValue)) {
+            tag.classList.add('selected');
+        } else {
+            tag.classList.remove('selected');
+        }
+    });
+}
+
+// Initialize tag click handlers for edit modal
+function initEditTagHandlers() {
+    document.querySelectorAll('#editGenderTags .tag-option').forEach(tag => {
+        tag.addEventListener('click', () => {
+            const tagValue = tag.dataset.tag;
+            if (tag.classList.contains('selected')) {
+                tag.classList.remove('selected');
+                selectedEditTags.gender = selectedEditTags.gender.filter(t => t !== tagValue);
+            } else {
+                tag.classList.add('selected');
+                selectedEditTags.gender.push(tagValue);
+            }
+        });
+    });
+
+    document.querySelectorAll('#editStyleTags .tag-option').forEach(tag => {
+        tag.addEventListener('click', () => {
+            const tagValue = tag.dataset.tag;
+            if (tag.classList.contains('selected')) {
+                tag.classList.remove('selected');
+                selectedEditTags.style = selectedEditTags.style.filter(t => t !== tagValue);
+            } else {
+                tag.classList.add('selected');
+                selectedEditTags.style.push(tagValue);
+            }
+        });
+    });
+
+    document.querySelectorAll('#editSeasonTags .tag-option').forEach(tag => {
+        tag.addEventListener('click', () => {
+            const tagValue = tag.dataset.tag;
+            if (tag.classList.contains('selected')) {
+                tag.classList.remove('selected');
+                selectedEditTags.season = selectedEditTags.season.filter(t => t !== tagValue);
+            } else {
+                tag.classList.add('selected');
+                selectedEditTags.season.push(tagValue);
+            }
+        });
+    });
+}
+
+// Save post edit
+window.savePostEdit = async function() {
+    const saveBtn = document.getElementById('saveEditBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    
+    try {
+        const caption = document.getElementById('editCaption').value.trim();
+        
+        const response = await fetch('/api/posts/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                postUrl: currentEditingPost.url,
+                caption: caption,
+                gender: selectedEditTags.gender,
+                style: selectedEditTags.style,
+                season: selectedEditTags.season,
+                wardrobeItemIds: selectedWardrobeItemIds
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Post updated successfully!', 'success');
+            closeEditModal();
+            
+            // Reload the page to show updated data
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            throw new Error(data.message || 'Failed to update post');
+        }
+    } catch (error) {
+        console.error('Error updating post:', error);
+        showNotification('Failed to update post. Please try again.', 'error');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
+    }
+};
+
+// Initialize edit modal handlers when DOM loads
+const originalDOMContentLoaded = document.addEventListener;
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for the modal HTML to be in the DOM
+    setTimeout(() => {
+        initEditTagHandlers();
+        
+        // Close modal when clicking outside
+        const modal = document.getElementById('editPostModal');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeEditModal();
+                }
+            });
+        }
+    }, 100);
 });

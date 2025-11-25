@@ -1067,6 +1067,62 @@ app.post('/api/posts', requireLogin, upload.single('image'), async (req, res) =>
   }
 });
 
+// update
+app.put('/api/posts/update', requireLogin, async (req, res) => {
+  try {
+    const { postUrl, caption, gender, style, season, wardrobeItemIds } = req.body;
+    const userId = req.session.userId;
+
+    // Get wardrobe item details
+    let wardrobeItemsData = [];
+    if (wardrobeItemIds && wardrobeItemIds.length > 0) {
+      const placeholders = wardrobeItemIds.map(() => '?').join(',');
+      wardrobeItemsData = await db.all(
+        `SELECT id, name, category, brand, color, size, price, image FROM wardrobe WHERE id IN (${placeholders}) AND user_id = ?`,
+        [...wardrobeItemIds, userId]
+      );
+    }
+
+    // Read images.json
+    const imagesJsonPath = path.join(DATA, 'images.json');
+    const fileContent = await fs.readFile(imagesJsonPath, 'utf-8');
+    let imagesData = JSON.parse(fileContent);
+
+    // Find and update the post
+    const postIndex = imagesData.findIndex(img => img.url === postUrl && img.userId === userId);
+    
+    if (postIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Post not found' });
+    }
+
+    // Update the post data
+    imagesData[postIndex] = {
+      ...imagesData[postIndex],
+      caption: caption || '',
+      Gender: gender || [],
+      Style: style || [],
+      Season: season || [],
+      wardrobeItems: wardrobeItemsData
+    };
+
+    // Write back to file
+    await fs.writeFile(imagesJsonPath, JSON.stringify(imagesData, null, 2));
+
+    res.json({
+      success: true,
+      message: 'Post updated successfully!',
+      post: imagesData[postIndex]
+    });
+
+  } catch (error) {
+    console.error('❌ Error updating post:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update post: ' + error.message 
+    });
+  }
+});
+
 // Get user's posts
 app.get('/api/posts', requireLogin, async (req, res) => {
   try {
