@@ -25,13 +25,41 @@ document.addEventListener('DOMContentLoaded', () => {
   initComboSelects();
   initSectionTabs();
   initDetailsModal();
+  initEditOutfitModal(); // NEW
+  handleUrlParameters();
 });
+
+// Helper function to update the URL without reloading the page
+function updateUrlTab(tab) {
+  const url = new URL(window.location);
+  
+  if (tab === 'items') {
+    // Remove the tab parameter for items view (default)
+    url.searchParams.delete('tab');
+  } else {
+    // Set the tab parameter for outfits
+    url.searchParams.set('tab', tab);
+  }
+  
+  // Update URL without reloading the page
+  window.history.pushState({}, '', url);
+}
+
+let currentEditingOutfitId = null;
+let outfitViewModes = {};
 
 // Event Listeners
 function initEventListeners() {
   // View toggle buttons
-  document.getElementById('items-view-btn').addEventListener('click', () => switchView('items'));
-  document.getElementById('outfits-view-btn').addEventListener('click', () => switchView('outfits'));
+  document.getElementById('items-view-btn').addEventListener('click', () => {
+    switchView('items');
+    updateUrlTab('items');
+  });
+  
+  document.getElementById('outfits-view-btn').addEventListener('click', () => {
+    switchView('outfits');
+    updateUrlTab('outfits');
+  });
 
   // Search and filter
   document.getElementById('search-input').addEventListener('input', renderCurrentView);
@@ -81,6 +109,397 @@ function initEventListeners() {
       }
     }
   });
+
+  document.addEventListener('click', (e) => {
+    const deleteBtn = e.target.closest('.delete-btn');
+    const viewDetailsBtn = e.target.closest('.view-details-btn');
+    const editOutfitBtn = e.target.closest('.edit-outfit-btn'); // NEW
+    
+    if (deleteBtn) {
+      const itemId = deleteBtn.getAttribute('data-item-id');
+      const outfitId = deleteBtn.getAttribute('data-outfit-id');
+      
+      if (itemId) {
+        deleteItem(itemId);
+      } else if (outfitId) {
+        deleteOutfit(outfitId);
+      }
+    }
+    
+    if (viewDetailsBtn) {
+      const itemId = viewDetailsBtn.getAttribute('data-item-id');
+      if (itemId) {
+        openDetailsModal(parseInt(itemId));
+      }
+    }
+    
+    // NEW: Handle edit outfit button
+    if (editOutfitBtn) {
+      const outfitId = editOutfitBtn.getAttribute('data-outfit-id');
+      if (outfitId) {
+        openEditOutfitModal(parseInt(outfitId));
+      }
+    }
+  });
+}
+
+// NEW: Initialize Edit Outfit Modal
+function initEditOutfitModal() {
+  const modal = document.getElementById('edit-outfit-modal');
+  const closeBtn = document.getElementById('close-edit-outfit-modal-btn');
+  const cancelBtn = document.getElementById('cancel-edit-outfit-btn');
+  const saveBtn = document.getElementById('save-edit-outfit-btn');
+  
+  // Close modal
+  closeBtn.addEventListener('click', closeEditOutfitModal);
+  cancelBtn.addEventListener('click', closeEditOutfitModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target.id === 'edit-outfit-modal') closeEditOutfitModal();
+  });
+  
+  // Save button
+  saveBtn.addEventListener('click', saveEditedOutfit);
+  
+  // Cover image upload
+  const coverInput = document.getElementById('outfit-cover-input');
+  if (coverInput) {
+    coverInput.addEventListener('change', handleCoverImageUpload);
+  }
+  
+  // Remove cover image
+  const removeCoverBtn = document.getElementById('remove-cover-btn');
+  if (removeCoverBtn) {
+    removeCoverBtn.addEventListener('click', removeCoverImage);
+  }
+  
+  // Event delegation for removing items and adding items
+  modal.addEventListener('click', (e) => {
+    if (e.target.closest('.remove-outfit-item-btn')) {
+      const btn = e.target.closest('.remove-outfit-item-btn');
+      const itemId = btn.getAttribute('data-item-id');
+      removeItemFromEditingOutfit(itemId);
+    }
+    
+    if (e.target.closest('.add-to-outfit-btn')) {
+      const btn = e.target.closest('.add-to-outfit-btn');
+      const itemId = btn.getAttribute('data-item-id');
+      addItemToEditingOutfit(parseInt(itemId));
+    }
+  });
+  
+  // Search wardrobe items
+  const searchInput = document.getElementById('edit-outfit-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      renderAvailableItems();
+    });
+  }
+}
+
+// Handle cover image upload
+async function handleCoverImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  if (!currentEditingOutfitId) {
+    alert('Please save the outfit first before adding a cover image');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('coverImage', file);
+  
+  try {
+    const res = await fetch(`/api/outfits/${currentEditingOutfitId}/cover`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+    
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    
+    // Update outfit with cover image
+    const outfit = outfits.find(o => o.id === currentEditingOutfitId);
+    if (outfit) {
+      outfit.cover_image = data.coverImage;
+    }
+    
+    // Update preview
+    renderCoverImagePreview(data.coverImage);
+    
+    console.log('✅ Cover image uploaded:', data.coverImage);
+  } catch (error) {
+    console.error('❌ Error uploading cover image:', error);
+    alert('Failed to upload cover image: ' + error.message);
+  }
+}
+
+// Remove cover image
+async function removeCoverImage() {
+  if (!currentEditingOutfitId) return;
+  
+  if (!confirm('Are you sure you want to remove the cover image?')) return;
+  
+  try {
+    const res = await fetch(`/api/outfits/${currentEditingOutfitId}/cover`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    
+    // Update outfit
+    const outfit = outfits.find(o => o.id === currentEditingOutfitId);
+    if (outfit) {
+      outfit.cover_image = null;
+    }
+    
+    // Update preview
+    renderCoverImagePreview(null);
+    
+    console.log('✅ Cover image removed');
+  } catch (error) {
+    console.error('❌ Error removing cover image:', error);
+    alert('Failed to remove cover image: ' + error.message);
+  }
+}
+
+function renderCoverImagePreview(coverImage) {
+  const previewContainer = document.getElementById('cover-image-preview');
+  const removeBtn = document.getElementById('remove-cover-btn');
+  
+  if (!previewContainer) return;
+  
+  if (coverImage) {
+    previewContainer.innerHTML = `<img src="${coverImage}" alt="Cover" />`;
+    previewContainer.classList.remove('empty');
+    if (removeBtn) removeBtn.disabled = false;
+  } else {
+    previewContainer.innerHTML = 'No cover image';
+    previewContainer.classList.add('empty');
+    if (removeBtn) removeBtn.disabled = true;
+  }
+}
+
+// NEW: Open edit outfit modal
+function openEditOutfitModal(outfitId) {
+  currentEditingOutfitId = outfitId;
+  const outfit = outfits.find(o => o.id === outfitId);
+  if (!outfit) return;
+  
+  const modal = document.getElementById('edit-outfit-modal');
+  
+  // Set outfit name
+  document.getElementById('edit-outfit-name').value = outfit.name;
+  
+  // Render cover image preview
+  renderCoverImagePreview(outfit.cover_image);
+  
+  // Render current items in outfit
+  renderEditingOutfitItems(outfit.items);
+  
+  // Render available wardrobe items
+  renderAvailableItems();
+  
+  modal.classList.remove('hidden');
+}
+
+// NEW: Close edit outfit modal
+function closeEditOutfitModal() {
+  document.getElementById('edit-outfit-modal').classList.add('hidden');
+  currentEditingOutfitId = null;
+  document.getElementById('edit-outfit-search').value = '';
+}
+
+// NEW: Render current outfit items being edited
+function renderEditingOutfitItems(outfitItems) {
+  const container = document.getElementById('editing-outfit-items');
+  
+  if (!outfitItems || outfitItems.length === 0) {
+    container.innerHTML = '<p class="empty-outfit-msg">No items in this outfit yet. Add items from below.</p>';
+    return;
+  }
+  
+  container.innerHTML = outfitItems.map(item => {
+    const itemId = item.itemId || item.id;
+    const itemName = item.name || item.itemName || 'Unknown Item';
+    const itemCategory = item.category || '';
+    const itemImage = item.image || item.imageUrl || '';
+    
+    return `
+      <div class="editing-outfit-item">
+        <img src="${itemImage}" alt="${itemName}" />
+        <div class="editing-item-info">
+          <p class="editing-item-name">${itemName}</p>
+          <p class="editing-item-category">${itemCategory}</p>
+        </div>
+        <button class="remove-outfit-item-btn" data-item-id="${itemId}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+// NEW: Render available wardrobe items to add
+function renderAvailableItems() {
+  const container = document.getElementById('available-wardrobe-items');
+  const searchQuery = document.getElementById('edit-outfit-search').value.toLowerCase();
+  const outfit = outfits.find(o => o.id === currentEditingOutfitId);
+  
+  if (!outfit) return;
+  
+  // Get IDs of items already in the outfit
+  const outfitItemIds = outfit.items.map(item => item.itemId || item.id);
+  
+  // Filter out items already in outfit and apply search
+  const availableItems = items.filter(item => {
+    const notInOutfit = !outfitItemIds.includes(item.id);
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery);
+    return notInOutfit && matchesSearch;
+  });
+  
+  if (availableItems.length === 0) {
+    container.innerHTML = '<p class="no-available-items">No items available to add.</p>';
+    return;
+  }
+  
+  container.innerHTML = availableItems.map(item => `
+    <div class="available-item">
+      <img src="${item.image}" alt="${item.name}" />
+      <div class="available-item-info">
+        <p class="available-item-name">${item.name}</p>
+        <p class="available-item-category">${item.category}</p>
+      </div>
+      <button class="add-to-outfit-btn" data-item-id="${item.id}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+// NEW: Remove item from outfit being edited
+function removeItemFromEditingOutfit(itemId) {
+  const outfit = outfits.find(o => o.id === currentEditingOutfitId);
+  if (!outfit) return;
+  
+  outfit.items = outfit.items.filter(item => (item.itemId || item.id) != itemId);
+  
+  renderEditingOutfitItems(outfit.items);
+  renderAvailableItems();
+}
+
+function addItemToEditingOutfit(itemId) {
+  const outfit = outfits.find(o => o.id === currentEditingOutfitId);
+  const item = items.find(i => i.id === itemId);
+  
+  if (!outfit || !item) return;
+  
+  // Check if item already exists
+  const alreadyExists = outfit.items.some(i => {
+    const existingId = i.itemId || i.id;
+    return existingId === itemId;
+  });
+  
+  if (alreadyExists) {
+    console.log('Item already in outfit');
+    return;
+  }
+  
+  // Add item to outfit with consistent structure
+  outfit.items.push({
+    itemId: item.id,
+    id: item.id,
+    name: item.name,
+    itemName: item.name,
+    category: item.category,
+    image: item.image,
+    imageUrl: item.image
+  });
+  
+  console.log('➕ Added item to outfit:', item.name);
+  
+  renderEditingOutfitItems(outfit.items);
+  renderAvailableItems();
+}
+
+async function saveEditedOutfit() {
+  if (!currentEditingOutfitId) return;
+  
+  const outfit = outfits.find(o => o.id === currentEditingOutfitId);
+  if (!outfit) return;
+  
+  const newName = document.getElementById('edit-outfit-name').value.trim();
+  
+  if (!newName) {
+    alert('Please provide an outfit name');
+    return;
+  }
+  
+  if (outfit.items.length === 0) {
+    alert('Please add at least one item to the outfit');
+    return;
+  }
+  
+  // Prepare items data with correct structure
+  const itemsData = outfit.items.map(item => {
+    const itemId = item.itemId || item.id;
+    const itemName = item.name || item.itemName || 'Unknown Item';
+    const itemCategory = item.category || '';
+    const itemImage = item.image || item.imageUrl || '';
+    
+    return {
+      itemId: itemId,
+      itemName: itemName,
+      name: itemName,
+      category: itemCategory,
+      image: itemImage,
+      imageUrl: itemImage
+    };
+  });
+  
+  console.log('💾 Saving outfit with data:', { 
+    id: currentEditingOutfitId, 
+    name: newName, 
+    itemCount: itemsData.length,
+    items: itemsData 
+  });
+  
+  try {
+    const res = await fetch(`/api/outfits/${currentEditingOutfitId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        name: newName,
+        items: itemsData
+      })
+    });
+    
+    const data = await res.json();
+    
+    console.log('📥 Server response:', data);
+    
+    if (!data.success) throw new Error(data.message);
+    
+    // Update local outfit with new data (preserve cover_image)
+    outfit.name = newName;
+    outfit.items = itemsData;
+    if (data.outfit.cover_image !== undefined) {
+      outfit.cover_image = data.outfit.cover_image;
+    }
+    
+    renderCurrentView();
+    closeEditOutfitModal();
+    
+    alert('Outfit updated successfully!');
+    console.log('✅ Updated outfit:', currentEditingOutfitId);
+  } catch (error) {
+    console.error('❌ Error updating outfit:', error);
+    alert('Failed to update outfit: ' + error.message);
+  }
 }
 
 // Initialize Details Modal
@@ -422,31 +841,85 @@ function renderOutfits() {
     document.getElementById('empty-message').textContent = 'Create your first outfit to see it here!';
   } else {
     emptyState.classList.add('hidden');
-    outfitsView.innerHTML = filteredOutfits.map(outfit => `
-      <div class="outfit-card">
-        <div class="outfit-header">
-          <h3 class="outfit-name">${outfit.name}</h3>
-          <button class="delete-btn" data-outfit-id="${outfit.id}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          </button>
-        </div>
-        <div class="outfit-body">
-          <div class="outfit-items-grid">
-            ${outfit.items && outfit.items.length > 0 ? outfit.items.map(item => `
-              <div class="outfit-item">
-                <img src="${item.image}" alt="${item.name}" />
-              </div>
-            `).join('') : '<p class="outfit-empty">No items in this outfit</p>'}
+    outfitsView.innerHTML = filteredOutfits.map(outfit => {
+      const viewMode = outfitViewModes[outfit.id] || 'items';
+      const hasCover = outfit.cover_image != null;
+      
+      return `
+        <div class="outfit-card">
+          <div class="outfit-header">
+            <h3 class="outfit-name">${outfit.name}</h3>
+            <div class="outfit-actions">
+              <button class="edit-outfit-btn" data-outfit-id="${outfit.id}" title="Edit outfit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              </button>
+              <button class="delete-btn" data-outfit-id="${outfit.id}" title="Delete outfit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
           </div>
-          ${outfit.items && outfit.items.length > 0 ? `
-            <p class="outfit-count">
-              ${outfit.items.length} ${outfit.items.length === 1 ? 'item' : 'items'}
-            </p>
-          ` : ''}
+          <div class="outfit-body">
+            ${hasCover ? `
+              <div class="outfit-view-toggle">
+                <button class="outfit-view-btn ${viewMode === 'cover' ? 'active' : ''}" data-outfit-id="${outfit.id}" data-view="cover">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  Cover
+                </button>
+                <button class="outfit-view-btn ${viewMode === 'items' ? 'active' : ''}" data-outfit-id="${outfit.id}" data-view="items">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                  Items
+                </button>
+              </div>
+            ` : ''}
+            
+            <!-- Cover View -->
+            <div class="outfit-cover-view ${!hasCover || viewMode !== 'cover' ? 'hidden' : ''}">
+              <div class="outfit-cover-wrapper">
+                ${hasCover ? `
+                  <img src="${outfit.cover_image}" alt="${outfit.name}" class="outfit-cover-image" />
+                ` : `
+                  <div class="outfit-no-cover">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    <p>No cover image</p>
+                  </div>
+                `}
+              </div>
+            </div>
+            
+            <!-- Items View -->
+            <div class="outfit-items-view ${hasCover && viewMode === 'cover' ? 'hidden' : ''}">
+              <div class="outfit-items-grid">
+                ${outfit.items && outfit.items.length > 0 ? outfit.items.map(item => `
+                  <div class="outfit-item">
+                    <img src="${item.image}" alt="${item.name}" />
+                  </div>
+                `).join('') : '<p class="outfit-empty">No items in this outfit</p>'}
+              </div>
+              ${outfit.items && outfit.items.length > 0 ? `
+                <p class="outfit-count">
+                  ${outfit.items.length} ${outfit.items.length === 1 ? 'item' : 'items'}
+                </p>
+              ` : ''}
+            </div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+    
+    // Add event listeners for view toggle buttons
+    document.querySelectorAll('.outfit-view-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const outfitId = parseInt(btn.dataset.outfitId);
+        const view = btn.dataset.view;
+        toggleOutfitView(outfitId, view);
+      });
+    });
   }
+}
+
+function toggleOutfitView(outfitId, view) {
+  outfitViewModes[outfitId] = view;
+  renderOutfits();
 }
 
 // Modal functions
@@ -685,3 +1158,22 @@ async function deleteOutfit(id) {
     alert('Failed to delete outfit.');
   }
 }
+
+// Handle URL parameters for tab switching
+function handleUrlParameters() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab');
+  
+  if (tab === 'outfits') {
+    // Use switchView to properly update all UI elements
+    currentView = 'outfits';
+    switchView('outfits');
+    
+    console.log('✅ Switched to outfits view from URL parameter');
+  }
+}
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', () => {
+  handleUrlParameters();
+});

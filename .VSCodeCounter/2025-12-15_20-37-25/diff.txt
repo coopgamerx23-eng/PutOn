@@ -1,0 +1,69 @@
+Date : 2025-12-15 20:37:25
+Directory : c:\Users\Natha\OneDrive\Documents\PutOn
+Total : 33 files,  7956 codes, 405 comments, 1243 blanks, all 9604 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PostCSS    |         10 |      3,148 |         38 |        504 |      3,690 |
+| JavaScript |         12 |      2,888 |        310 |        619 |      3,817 |
+| HTML       |         10 |      1,187 |         57 |        120 |      1,364 |
+| JSON       |          1 |        733 |          0 |          0 |        733 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |         33 |      7,956 |        405 |      1,243 |      9,604 |
+| . (Files)                                                                     |          1 |        643 |         44 |        110 |        797 |
+| assets                                                                        |         21 |      5,393 |        304 |      1,013 |      6,710 |
+| assets\css                                                                    |         10 |      3,148 |         38 |        504 |      3,690 |
+| assets\js                                                                     |         11 |      2,245 |        266 |        509 |      3,020 |
+| assets\js\components                                                          |          3 |       -108 |          4 |         51 |        -53 |
+| assets\js\pages                                                               |          8 |      2,353 |        262 |        458 |      3,073 |
+| components                                                                    |          1 |          1 |          0 |          0 |          1 |
+| data                                                                          |          1 |        733 |          0 |          0 |        733 |
+| pages                                                                         |          9 |      1,186 |         57 |        120 |      1,363 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                      | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\account-settings.css       | PostCSS    |        701 |         10 |        112 |        823 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\brand-detail.css           | PostCSS    |        215 |          0 |         39 |        254 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\brand-of-the-day.css       | PostCSS    |        343 |          3 |         60 |        406 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\build-outfit.css           | PostCSS    |        154 |          0 |         23 |        177 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\explore.css                | PostCSS    |        -20 |          0 |         -1 |        -21 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\follow-page.css            | PostCSS    |        198 |          1 |         33 |        232 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\new-post.css               | PostCSS    |        138 |          1 |         21 |        160 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\profile.css                | PostCSS    |        844 |         10 |        136 |        990 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\virtual-wardrobe.css       | PostCSS    |        542 |         11 |         76 |        629 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\css\wishlist.css               | PostCSS    |         33 |          2 |          5 |         40 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\components\header.js        | JavaScript |         -1 |          0 |          0 |         -1 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\components\load-user.js     | JavaScript |         13 |          0 |          0 |         13 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\components\scroll-images.js | JavaScript |       -120 |          4 |         51 |        -65 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\brand-of-the-day.js   | JavaScript |         13 |          6 |          2 |         21 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\build-outfit.js       | JavaScript |        198 |         64 |        108 |        370 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\explore-page.js       | JavaScript |       -153 |         37 |          6 |       -110 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\new-post.js           | JavaScript |         70 |         -2 |         12 |         80 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\profile.js            | JavaScript |        625 |         46 |         90 |        761 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\settings.js           | JavaScript |        864 |         35 |         96 |        995 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\virtual-wardrobe.js   | JavaScript |        573 |         62 |        126 |        761 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\assets\js\pages\wishlist.js           | JavaScript |        163 |         14 |         18 |        195 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\components\header.html                | HTML       |          1 |          0 |          0 |          1 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\data\images.json                      | JSON       |        733 |          0 |          0 |        733 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\account-settings.html           | HTML       |        150 |         13 |         20 |        183 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\brand-detail.html               | HTML       |        105 |          4 |         15 |        124 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\brand-of-the-day.html           | HTML       |        218 |         10 |         11 |        239 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\build-outfit.html               | HTML       |         12 |          0 |          0 |         12 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\follow-page.html                | HTML       |        226 |          0 |         25 |        251 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\new-post.html                   | HTML       |         18 |          2 |          3 |         23 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\profile.html                    | HTML       |        143 |          7 |         17 |        167 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\virtual-wardrobe.html           | HTML       |        255 |         15 |         17 |        287 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\pages\wishlist.html                   | HTML       |         59 |          6 |         12 |         77 |
+| c:\Users\Natha\OneDrive\Documents\PutOn\server.js                             | JavaScript |        643 |         44 |        110 |        797 |
+| Total                                                                         |            |      7,956 |        405 |      1,243 |      9,604 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

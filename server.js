@@ -14,78 +14,57 @@ import multer from 'multer';
 import fs from 'fs/promises';
 
 
-// Configure multer for profile picture uploads
-const profilePicStorage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(ROOT, 'assets/images/profile-pictures');
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-      cb(null, uploadDir);
-    } catch (error) {
-      cb(error);
-    }
-  },
-  filename: (req, file, cb) => {
-    const userId = req.session.userId;
-    const ext = path.extname(file.originalname);
-    cb(null, `user_${userId}_${Date.now()}${ext}`);
-  }
-});
-
-const uploadProfilePic = multer({ 
-  storage: profilePicStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only images are allowed'));
-    }
-  }
-})
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(ROOT, 'assets/images/outfits/user-posts');
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-      cb(null, uploadDir);
-    } catch (error) {
-      cb(error);
-    }
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename
-    const timestamp = Date.now();
-    const ext = path.extname(file.originalname);
-    cb(null, `post_${timestamp}${ext}`);
-  }
-});
-
-const upload = multer({ 
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only images are allowed'));
-    }
-  }
-});
-
-
-const SQLiteStoreSession = SQLiteStore(session);
-
 // Load environment variables FIRST
 dotenv.config();
 
-// Debug: Check if API key is loaded
-console.log('🔑 API Key loaded:', process.env.HUGGINGFACE_API_KEY ? 'YES ✓' : 'NO ✗');
-if (process.env.HUGGINGFACE_API_KEY) {
-  console.log('🔑 API Key preview:', process.env.HUGGINGFACE_API_KEY.substring(0, 10) + '...');
-}
+const SQLiteStoreSession = SQLiteStore(session);
+
+const createStorage = (folder, prefix) => multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(ROOT, folder);
+    try {
+      await fs.mkdir(uploadDir, { recursive: true });
+      cb(null, uploadDir);
+    } catch (error) {
+      cb(error);
+    }
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const ext = path.extname(file.originalname);
+    const userId = req.session?.userId || 'guest';
+    cb(null, `${prefix}_${userId}_${timestamp}${ext}`);
+  }
+});
+
+// Helper function to create multer upload
+const createUpload = (storage, sizeLimit) => multer({
+  storage,
+  limits: { fileSize: sizeLimit * 1024 * 1024 }, // Convert MB to bytes
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images are allowed'));
+    }
+  }
+});
+
+// Profile pictures
+const profilePicStorage = createStorage('assets/images/profile-pictures', 'user');
+const uploadProfilePic = createUpload(profilePicStorage, 5); // 5MB
+
+// Post images
+const postStorage = createStorage('assets/images/outfits/user-posts', 'post');
+const upload = createUpload(postStorage, 10); // 10MB
+
+// Put On images
+const putonStorage = createStorage('assets/images/putons', 'puton');
+const uploadPutonImage = createUpload(putonStorage, 5); // 5MB
+
+// Outfit cover images
+const outfitCoverStorage = createStorage('assets/images/outfits/covers', 'outfit_cover');
+const uploadOutfitCover = createUpload(outfitCoverStorage, 10); // 10MB
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -314,24 +293,6 @@ let db;
     `);
 
     await db.exec(`
-      CREATE TABLE IF NOT EXISTS wishlist (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        name TEXT,
-        type TEXT,
-        brand TEXT,
-        color TEXT,
-        size TEXT,
-        price TEXT,
-        image TEXT,
-        category TEXT,
-        notes TEXT,
-        addedAt TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-      );
-    `);
-
-    await db.exec(`
       CREATE TABLE IF NOT EXISTS putons (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
@@ -345,7 +306,8 @@ let db;
         category TEXT,
         notes TEXT,
         source_image TEXT,
-        added_at TEXT
+        added_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
       );
     `);
 
@@ -373,6 +335,7 @@ let db;
         name TEXT NOT NULL,
         description TEXT,
         created_at TEXT DEFAULT (datetime('now')),
+        cover_image TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id)
       );
     `);
@@ -420,6 +383,18 @@ let db;
       );
     `);
 
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS followers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        follower_id INTEGER NOT NULL,
+        following_id INTEGER NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(follower_id, following_id)
+      );
+    `);
+
     console.log('✅ Database initialized');
 
 
@@ -463,153 +438,298 @@ app.get('/test', (req, res) => {
   });
 });
 
+// ============================================
+// PUT ONS ROUTES (CONSOLIDATED)
+// ============================================
 
-// API endpoint for clothing detection with FREE AI
-app.post('/api/detect-clothing', async (req, res) => {
+// ✅ Add new puton item
+app.post("/api/putons", requireLogin, async (req, res) => {
   try {
-    const { imageUrl } = req.body;
-   
-    console.log('📸 Analyzing image:', imageUrl);
-   
-    if (!imageUrl) {
-      return res.status(400).json({
-        success: false,
-        error: 'No image URL provided'
-      });
+    const { name, type, brand, color, size, price, image, category, notes, sourceImage } = req.body;
+    const userId = req.session.userId;
+
+    if (!name || !type) {
+      return res.status(400).json({ success: false, message: "Missing name or type" });
     }
-   
-    // Check if Hugging Face API key is set
-    const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
-   
-    console.log('🔍 Checking API key... Key exists:', !!HF_API_KEY);
-   
-    if (!HF_API_KEY) {
-      console.log('⚠️ No Hugging Face API key found, using mock data');
-      console.log('💡 Get a FREE API key at: https://huggingface.co/settings/tokens');
-      // Fallback to mock data if no API key
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const detectedItems = generateClothingData();
-      return res.json({
-        success: true,
-        items: detectedItems,
-        total: detectedItems.length,
-        message: 'Detection complete (mock data - set HUGGINGFACE_API_KEY for free AI detection)'
-      });
-    }
-   
-    // Use FREE Hugging Face AI vision detection
-    console.log('🤖 Using Hugging Face Vision API (FREE) for real detection...');
-   
-    try {
-      // First, fetch the image to convert to base64
-      let imageData;
-      if (imageUrl.startsWith('http://localhost') || imageUrl.startsWith('/')) {
-        // Local image - read from file system
-        const fs = await import('fs');
-        const fsPromises = await import('fs/promises');
-       
-        // Convert URL to file path
-        let imagePath = imageUrl.replace('http://localhost:3000', '').replace('http://localhost:' + PORT, '');
-        if (imagePath.startsWith('/')) {
-          imagePath = path.join(ROOT, imagePath);
-        }
-       
-        console.log('📂 Reading local file:', imagePath);
-       
-        try {
-          imageData = await fsPromises.readFile(imagePath);
-        } catch (fileError) {
-          console.error('File read error:', fileError.message);
-          throw new Error(`Could not read image file: ${fileError.message}`);
-        }
-      } else {
-        // Remote image - fetch it
-        const imgResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        imageData = Buffer.from(imgResponse.data);
+
+    const addedAt = new Date().toISOString();
+
+    const result = await db.run(
+      `INSERT INTO putons (user_id, name, type, brand, color, size, price, image, category, notes, source_image, added_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [userId, name, type, brand, color, size, price, image, category, notes, sourceImage, addedAt]
+    );
+
+    res.json({
+      success: true,
+      message: "Item added to Put Ons!",
+      item: { 
+        id: result.lastID, 
+        name, 
+        type, 
+        brand, 
+        color, 
+        size, 
+        price, 
+        image, 
+        category, 
+        notes, 
+        sourceImage,
+        addedAt 
       }
-     
-      // Resize image if it's too large (max 1MB for free tier)
-      const sharp = (await import('sharp')).default;
-      console.log('🖼️ Resizing image to reduce size...');
-     
-      imageData = await sharp(imageData)
-        .resize(800, 800, {
-          fit: 'inside',
-          withoutEnlargement: true
-        })
-        .jpeg({ quality: 80 })
-        .toBuffer();
-     
-      console.log('📦 Image size:', (imageData.length / 1024).toFixed(2), 'KB');
-     
-      // Use ViT-GPT2 model for image captioning (more reliable)
-      console.log('🔄 Sending image to Hugging Face API...');
-     
-      const response = await axios.post(
-        'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base',
-        imageData,
-        {
-          headers: {
-            'Authorization': `Bearer ${HF_API_KEY}`,
-            "Content-Type": "application/octet-stream"
-          },
-          timeout: 30000 // 30 second timeout
-        }
-      );
-     
-      console.log('📥 Response status:', response.status);
-      console.log('📥 Response data:', JSON.stringify(response.data));
-     
-      // Handle different response formats
-      let caption = '';
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        caption = response.data[0]?.generated_text || '';
-      } else if (response.data.error) {
-        // Model is loading
-        console.log('⏳ Model is loading, please wait...');
-        throw new Error('Model is still loading. Please try again in a few seconds.');
-      }
-     
-      console.log('🤖 AI Caption:', caption);
-     
-      // Parse the caption to extract clothing items
-      const detectedItems = parseClothingFromCaption(caption);
-     
-      console.log('✅ Detected', detectedItems.length, 'items');
-     
-      res.json({
-        success: true,
-        items: detectedItems,
-        total: detectedItems.length,
-        message: 'Detection complete (FREE AI-powered by Hugging Face)'
-      });
-     
-    } catch (aiError) {
-        console.error('AI API Error Details:', {
-          message: aiError.message,
-          status: aiError.response?.status,
-          data: aiError.response?.data
-        });
-      
-        // If it's a 503 or model loading error, give helpful message
-        if (aiError.response?.status === 503 || aiError.message.includes('loading')) {
-          throw new Error('AI model is warming up. Please wait 10-20 seconds and try again.');
-        }
-      
-        throw aiError;
+    });
+  } catch (err) {
+    console.error("❌ Error adding Put On item:", err);
+    res.status(500).json({ success: false, message: "Failed to add Put On item" });
+  }
+});
+
+// ✅ Get all puton items for the logged-in user
+app.get("/api/putons", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const items = await db.all(
+      "SELECT * FROM putons WHERE user_id = ? ORDER BY added_at DESC", 
+      [userId]
+    );
+    res.json({ success: true, items });
+  } catch (err) {
+    console.error("❌ Error fetching Put Ons:", err);
+    res.status(500).json({ success: false, message: "Failed to load Put Ons" });
+  }
+});
+
+// ✅ Update a puton item
+app.put("/api/putons/:id", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const itemId = req.params.id;
+    const { name, type, brand, color, size, price, category, notes } = req.body;
+
+    if (!name || !type) {
+      return res.status(400).json({ success: false, message: "Name and type are required" });
     }
-   
+
+    // Verify the item belongs to the user
+    const existingItem = await db.get(
+      "SELECT id FROM putons WHERE id = ? AND user_id = ?",
+      [itemId, userId]
+    );
+
+    if (!existingItem) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    await db.run(
+      `UPDATE putons 
+       SET name = ?, type = ?, brand = ?, color = ?, size = ?, price = ?, category = ?, notes = ?
+       WHERE id = ? AND user_id = ?`,
+      [name, type, brand || '', color || '', size || '', price || '', category || '', notes || '', itemId, userId]
+    );
+
+    res.json({
+      success: true,
+      message: "Item updated successfully!",
+      item: { id: parseInt(itemId), name, type, brand, color, size, price, category, notes }
+    });
+  } catch (err) {
+    console.error("❌ Error updating Put On item:", err);
+    res.status(500).json({ success: false, message: "Failed to update Put On item" });
+  }
+});
+
+// ✅ Delete a puton item
+app.delete("/api/putons/:id", requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const itemId = req.params.id;
+    const result = await db.run(
+      "DELETE FROM putons WHERE id = ? AND user_id = ?", 
+      [itemId, userId]
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    res.json({ success: true, message: "Item deleted from Put Ons" });
+  } catch (err) {
+    console.error("❌ Error deleting Put On item:", err);
+    res.status(500).json({ success: false, message: "Failed to delete item" });
+  }
+});
+
+// ✅ Upload image for puton item
+app.post('/api/putons/upload-image', requireLogin, uploadPutonImage.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image uploaded' });
+    }
+
+    const imageUrl = `/assets/images/putons/${req.file.filename}`;
+
+    res.json({
+      success: true,
+      imageUrl: imageUrl
+    });
+
   } catch (error) {
-      console.error('❌ Error:', error.message);
+    console.error('❌ Error uploading Put On image:', error);
     
-      // Fallback to mock data on error
-      const detectedItems = generateClothingData();
-      res.json({
-        success: true,
-        items: detectedItems,
-        total: detectedItems.length,
-        message: 'Detection complete (fallback to mock data due to API error)'
-      });
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting file:', unlinkError);
+      }
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to upload image: ' + error.message 
+    });
+  }
+});
+
+// ============================================
+// FOLLOW SYSTEM ROUTES
+// ============================================
+
+// Follow/Unfollow a user
+app.post('/api/follow', requireLogin, async (req, res) => {
+  try {
+    const { userId, action } = req.body;
+    const currentUserId = req.session.userId;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID required' });
+    }
+
+    if (userId === currentUserId) {
+      return res.status(400).json({ success: false, message: 'Cannot follow yourself' });
+    }
+
+    if (action === 'follow') {
+      // Add follow relationship
+      await db.run(
+        'INSERT OR IGNORE INTO followers (follower_id, following_id) VALUES (?, ?)',
+        [currentUserId, userId]
+      );
+    } else if (action === 'unfollow') {
+      // Remove follow relationship
+      await db.run(
+        'DELETE FROM followers WHERE follower_id = ? AND following_id = ?',
+        [currentUserId, userId]
+      );
+    }
+
+    res.json({ 
+      success: true, 
+      isFollowing: action === 'follow'
+    });
+  } catch (error) {
+    console.error('Error toggling follow:', error);
+    res.status(500).json({ success: false, message: 'Failed to update follow status' });
+  }
+});
+
+// Get followers for current user
+app.get('/api/followers/:userId', async (req, res) => {
+  try {
+    const targetUserId = req.params.userId;
+    const currentUserId = req.session?.userId;
+    
+    // Get all users who follow the target user
+    const followers = await db.all(`
+      SELECT 
+        u.id, 
+        u.name, 
+        u.username, 
+        u.bio, 
+        u.profile_picture,
+        CASE WHEN f2.follower_id IS NOT NULL THEN 1 ELSE 0 END as isFollowing
+      FROM followers f
+      JOIN users u ON f.follower_id = u.id
+      LEFT JOIN followers f2 ON f2.follower_id = ? AND f2.following_id = u.id
+      WHERE f.following_id = ?
+      ORDER BY f.created_at DESC
+    `, [currentUserId || 0, targetUserId]);
+
+    res.json({ success: true, followers });
+  } catch (error) {
+    console.error('Error fetching followers:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch followers' });
+  }
+});
+
+// Get users that current user is following
+app.get('/api/following/:userId', async (req, res) => {
+  try {
+    const targetUserId = req.params.userId;
+    const currentUserId = req.session?.userId;
+    
+    // Get all users that the target user follows
+    const following = await db.all(`
+      SELECT 
+        u.id, 
+        u.name, 
+        u.username, 
+        u.bio, 
+        u.profile_picture,
+        CASE WHEN f2.follower_id IS NOT NULL THEN 1 ELSE 0 END as isFollowing
+      FROM followers f
+      JOIN users u ON f.following_id = u.id
+      LEFT JOIN followers f2 ON f2.follower_id = ? AND f2.following_id = u.id
+      WHERE f.follower_id = ?
+      ORDER BY f.created_at DESC
+    `, [currentUserId || 0, targetUserId]);
+
+    res.json({ success: true, following });
+  } catch (error) {
+    console.error('Error fetching following:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch following' });
+  }
+});
+
+// Check if current user follows another user
+app.get('/api/follow-status/:userId', requireLogin, async (req, res) => {
+  try {
+    const targetUserId = req.params.userId;
+    const currentUserId = req.session.userId;
+
+    const follow = await db.get(
+      'SELECT id FROM followers WHERE follower_id = ? AND following_id = ?',
+      [currentUserId, targetUserId]
+    );
+
+    res.json({ 
+      success: true, 
+      isFollowing: !!follow 
+    });
+  } catch (error) {
+    console.error('Error checking follow status:', error);
+    res.status(500).json({ success: false, message: 'Failed to check follow status' });
+  }
+});
+
+// Get follower/following counts for a user
+app.get('/api/follow-counts/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const [followersCount, followingCount] = await Promise.all([
+      db.get('SELECT COUNT(*) as count FROM followers WHERE following_id = ?', [userId]),
+      db.get('SELECT COUNT(*) as count FROM followers WHERE follower_id = ?', [userId])
+    ]);
+
+    res.json({
+      success: true,
+      followers: followersCount.count,
+      following: followingCount.count
+    });
+  } catch (error) {
+    console.error('Error getting follow counts:', error);
+    res.status(500).json({ success: false, message: 'Failed to get follow counts' });
   }
 });
 
@@ -1290,7 +1410,7 @@ app.post("/signup", async (req, res) => {
 
     const result = await db.run(
       "INSERT INTO users (name, username, email, bio, location, birthday, shirt_size, waist_size, chest_size, shoe_size, inseam, height, dark_mode, push_notifications, email_updates, private_profile, show_size_recommendations, preferred_style, hide_saved_content, show_following, show_followers, language, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [name, username, email, "", "", "", "", "", "", "", "", "", "false", "false", "false", "false", "false", "", "true", "true", "true", "english", hashed]
+      [name, username, email, "", "", "", "", "", "", "", "", "", "false", "false", "false", "false", "false", "all styles", "true", "true", "true", "english", hashed]
     );
 
 
@@ -1426,69 +1546,7 @@ app.put("/update-user", async (req, res) => {
 
 
 // ============================================
-// Put On Routes
-// ============================================
-
-app.post("/api/putons", async (req, res) => {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ success: false, message: "Not logged in" });
-    }
-
-    const { name, type, brand, color, size, price, image, category, notes, sourceImage } = req.body;
-
-    await db.run(
-      `INSERT INTO putons (user_id, name, type, brand, color, size, price, image, category, notes, source_image, added_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-      [req.session.userId, name, type, brand, color, size, price, image, category, notes, sourceImage]
-    );
-
-    res.json({ success: true, message: "Put on added successfully!" });
-  } catch (err) {
-    console.error("Error adding put on:", err);
-    res.status(500).json({ success: false, message: "Database error" });
-  }
-});
-
-// ✅ Get all "Put Ons" for the logged-in user
-app.get("/api/putons", requireLogin, async (req, res) => {
-  try {
-    const userId = req.session.userId;
-    const putons = await db.all(
-      "SELECT * FROM putons WHERE user_id = ? ORDER BY added_at DESC",
-      [userId]
-    );
-    res.json({ success: true, items: putons });
-  } catch (err) {
-    console.error("❌ Error fetching put on:", err);
-    res.status(500).json({ success: false, message: "Failed to load put ons" });
-  }
-});
-
-// ✅ Delete a put on
-app.delete("/api/putons/:id", requireLogin, async (req, res) => {
-  try {
-    const userId = req.session.userId;
-    const itemId = req.params.id;
-    const result = await db.run(
-      "DELETE FROM putons WHERE id = ? AND user_id = ?",
-      [itemId, userId]
-    );
-
-    if (result.changes === 0) {
-      return res.status(404).json({ success: false, message: "Item not found" });
-    }
-
-    res.json({ success: true, message: "Put on deleted" });
-  } catch (err) {
-    console.error("❌ Error deleting put on:", err);
-    res.status(500).json({ success: false, message: "Failed to delete put on" });
-  }
-});
-
-
-// ============================================
-// Build outfit route ROUTES
+// OUTFIT ROUTES
 // ============================================
 
 app.post('/api/outfits', requireLogin, async (req, res) => {
@@ -1508,66 +1566,237 @@ app.post('/api/outfits', requireLogin, async (req, res) => {
   }
 });
 
-// ============================================
-// WISHLIST ROUTES
-// ============================================
-
-// ✅ Add new wishlist item
-app.post("/api/wishlist", requireLogin, async (req, res) => {
+app.put('/api/outfits/:id', requireLogin, async (req, res) => {
   try {
-    const { name, type, brand, color, size, price, image, category, notes } = req.body;
+    const outfitId = parseInt(req.params.id);
+    const { name, items } = req.body;
     const userId = req.session.userId;
 
-    if (!name || !type) {
-      return res.status(400).json({ success: false, message: "Missing name or type" });
+    console.log('📝 Updating outfit:', { outfitId, name, itemCount: items?.length });
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Outfit name is required' 
+      });
     }
 
-    const addedAt = new Date().toISOString();
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'At least one item is required' 
+      });
+    }
 
-    const result = await db.run(
-      `INSERT INTO wishlist (user_id, name, type, brand, color, size, price, image, category, notes, addedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [userId, name, type, brand, color, size, price, image, category, notes, addedAt]
+    // Verify outfit belongs to user
+    const checkOwnership = await db.get(
+      'SELECT id, cover_image FROM outfits WHERE id = ? AND user_id = ?',
+      [outfitId, userId]
     );
+
+    if (!checkOwnership) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Outfit not found or access denied' 
+      });
+    }
+
+    // Prepare items data for storage
+    const itemsData = items.map(item => ({
+      itemId: item.itemId || item.id,
+      itemName: item.name || item.itemName || '',
+      category: item.category || '',
+      imageUrl: item.image || item.imageUrl || ''
+    }));
+
+    // Update outfit with new data (preserve cover_image)
+    await db.run(
+      'UPDATE outfits SET name = ?, description = ? WHERE id = ?',
+      [name.trim(), JSON.stringify(itemsData), outfitId]
+    );
+
+    console.log('✅ Updated outfit successfully');
+
+    res.json({ 
+      success: true, 
+      message: 'Outfit updated successfully',
+      outfit: {
+        id: outfitId,
+        name: name.trim(),
+        cover_image: checkOwnership.cover_image, // Return existing cover image
+        items: itemsData
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error updating outfit:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update outfit: ' + error.message 
+    });
+  }
+});
+
+app.post('/api/outfits/:id/cover', requireLogin, uploadOutfitCover.single('coverImage'), async (req, res) => {
+  try {
+    const outfitId = parseInt(req.params.id);
+    const userId = req.session.userId;
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image uploaded' });
+    }
+
+    // Verify outfit belongs to user
+    const outfit = await db.get(
+      'SELECT id, cover_image FROM outfits WHERE id = ? AND user_id = ?',
+      [outfitId, userId]
+    );
+
+    if (!outfit) {
+      // Delete uploaded file
+      await fs.unlink(req.file.path);
+      return res.status(404).json({ success: false, message: 'Outfit not found' });
+    }
+
+    const coverImageUrl = `/assets/images/outfits/covers/${req.file.filename}`;
+
+    // Update outfit with cover image
+    await db.run(
+      'UPDATE outfits SET cover_image = ? WHERE id = ?',
+      [coverImageUrl, outfitId]
+    );
+
+    // Delete old cover image if it exists
+    if (outfit.cover_image) {
+      const oldImagePath = path.join(ROOT, outfit.cover_image);
+      try {
+        await fs.unlink(oldImagePath);
+      } catch (error) {
+        console.log('Could not delete old cover image:', error);
+      }
+    }
 
     res.json({
       success: true,
-      message: "Item added to wishlist!",
-      item: { id: result.lastID, name, type, brand, color, size, price, image, category, notes, addedAt }
+      message: 'Cover image uploaded successfully',
+      coverImage: coverImageUrl
     });
-  } catch (err) {
-    console.error("❌ Error adding wishlist item:", err);
-    res.status(500).json({ success: false, message: "Failed to add wishlist item" });
+
+  } catch (error) {
+    console.error('❌ Error uploading cover image:', error);
+    
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting file:', unlinkError);
+      }
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to upload cover image: ' + error.message 
+    });
   }
 });
 
-// ✅ Get all wishlist items for the logged-in user
-app.get("/api/wishlist", requireLogin, async (req, res) => {
+app.delete('/api/outfits/:id/cover', requireLogin, async (req, res) => {
   try {
+    const outfitId = parseInt(req.params.id);
     const userId = req.session.userId;
-    const items = await db.all("SELECT * FROM wishlist WHERE user_id = ? ORDER BY addedAt DESC", [userId]);
-    res.json({ success: true, items });
-  } catch (err) {
-    console.error("❌ Error fetching wishlist:", err);
-    res.status(500).json({ success: false, message: "Failed to load wishlist" });
-  }
-});
 
-// ✅ Delete a wishlist item
-app.delete("/api/wishlist/:id", requireLogin, async (req, res) => {
-  try {
-    const userId = req.session.userId;
-    const itemId = req.params.id;
-    const result = await db.run("DELETE FROM wishlist WHERE id = ? AND user_id = ?", [itemId, userId]);
+    // Verify outfit belongs to user
+    const outfit = await db.get(
+      'SELECT id, cover_image FROM outfits WHERE id = ? AND user_id = ?',
+      [outfitId, userId]
+    );
 
-    if (result.changes === 0) {
-      return res.status(404).json({ success: false, message: "Item not found" });
+    if (!outfit) {
+      return res.status(404).json({ success: false, message: 'Outfit not found' });
     }
 
-    res.json({ success: true, message: "Item deleted" });
-  } catch (err) {
-    console.error("❌ Error deleting wishlist item:", err);
-    res.status(500).json({ success: false, message: "Failed to delete item" });
+    if (outfit.cover_image) {
+      // Delete the file
+      const imagePath = path.join(ROOT, outfit.cover_image);
+      try {
+        await fs.unlink(imagePath);
+      } catch (error) {
+        console.log('Could not delete cover image file:', error);
+      }
+
+      // Remove from database
+      await db.run('UPDATE outfits SET cover_image = NULL WHERE id = ?', [outfitId]);
+    }
+
+    res.json({
+      success: true,
+      message: 'Cover image removed'
+    });
+
+  } catch (error) {
+    console.error('❌ Error deleting cover image:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to delete cover image' 
+    });
+  }
+});
+
+// Get all outfits
+app.get('/api/outfits', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    // Get all outfits for the user (now includes cover_image)
+    const outfits = await db.all(
+      'SELECT * FROM outfits WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+    
+    // For each outfit, get its items
+    const outfitsWithItems = await Promise.all(outfits.map(async (outfit) => {
+      let items = [];
+      
+      if (outfit.description) {
+        try {
+          const parsedItems = JSON.parse(outfit.description);
+          
+          items = parsedItems.map(item => ({
+            id: item.itemId,
+            name: item.itemName || 'Unknown Item',
+            image: item.imageUrl,
+            category: item.category
+          }));
+        } catch (parseError) {
+          console.error('Error parsing outfit items:', parseError);
+        }
+      }
+      
+      return {
+        id: outfit.id,
+        name: outfit.name,
+        created_at: outfit.created_at,
+        cover_image: outfit.cover_image, // Include cover image
+        items: items
+      };
+    }));
+    
+    res.json({ success: true, outfits: outfitsWithItems });
+  } catch (error) {
+    console.error('Error fetching outfits:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Delete an outfit
+app.delete('/api/outfits/:id', requireLogin, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const outfitId = req.params.id;
+    await db.run('DELETE FROM outfits WHERE id = ? AND user_id = ?', [outfitId, userId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
   }
 });
 
@@ -1686,64 +1915,6 @@ app.delete("/api/wardrobe/:id", requireLogin, async (req, res) => {
   } catch (err) {
     console.error("❌ Error deleting wardrobe item:", err);
     res.status(500).json({ success: false, message: "Failed to delete wardrobe item" });
-  }
-});
-
-// Get all outfits
-app.get('/api/outfits', requireLogin, async (req, res) => {
-  try {
-    const userId = req.session.userId;
-    
-    // Get all outfits for the user
-    const outfits = await db.all(
-      'SELECT * FROM outfits WHERE user_id = ? ORDER BY created_at DESC',
-      [userId]
-    );
-    
-    // For each outfit, get its items
-    const outfitsWithItems = await Promise.all(outfits.map(async (outfit) => {
-      let items = [];
-      
-      if (outfit.description) {
-        try {
-          const parsedItems = JSON.parse(outfit.description);
-          
-          // Use the stored item data directly (includes the correct image URLs)
-          items = parsedItems.map(item => ({
-            id: item.itemId,
-            name: item.itemName || 'Unknown Item',
-            image: item.imageUrl, // This is the individual clothing piece image
-            category: item.category
-          }));
-        } catch (parseError) {
-          console.error('Error parsing outfit items:', parseError);
-        }
-      }
-      
-      return {
-        id: outfit.id,
-        name: outfit.name,
-        created_at: outfit.created_at,
-        items: items
-      };
-    }));
-    
-    res.json({ success: true, outfits: outfitsWithItems });
-  } catch (error) {
-    console.error('Error fetching outfits:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Delete an outfit
-app.delete('/api/outfits/:id', requireLogin, async (req, res) => {
-  try {
-    const userId = req.session.userId;
-    const outfitId = req.params.id;
-    await db.run('DELETE FROM outfits WHERE id = ? AND user_id = ?', [outfitId, userId]);
-    res.json({ success: true });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
   }
 });
 

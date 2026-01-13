@@ -307,77 +307,123 @@
         </div>
     </div>
 
-    <!-- Edit Post Modal -->
     <div class="edit-post-modal" id="editPostModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit Post</h2>
-                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+        <div class="view-modal-content">
+            <!-- Left side - Image -->
+            <div class="view-modal-left">
+                <img id="editPostImage" src="" alt="Post">
             </div>
-
-            <div class="modal-body">
-                <div class="loading" id="editLoading">
-                    <div class="spinner"></div>
-                    <p>Loading...</p>
+            
+            <!-- Right side - Details and Edit Form -->
+            <div class="view-modal-right">
+                <div class="view-modal-header">
+                    <h3>Post Details</h3>
+                    <button class="close-view-btn" onclick="closeEditModal()">&times;</button>
                 </div>
 
-                <div id="editFormContent" style="display: none;">
-                    <div class="post-preview">
-                        <img id="editPostImage" src="" alt="Post preview">
+                <div class="view-modal-body">
+                    <div class="loading" id="editLoading">
+                        <div class="spinner"></div>
+                        <p>Loading...</p>
                     </div>
 
-                    <div class="wardrobe-section-edit">
-                        <h3>Tagged Wardrobe Items</h3>
-                        <div class="wardrobe-items-grid" id="editWardrobeGrid">
-                            <!-- Wardrobe items will be loaded here -->
+                    <div id="editFormContent" style="display: none;">
+                        <!-- Caption Section -->
+                        <div class="view-post-section">
+                            <h4>Caption</h4>
+                            <textarea id="editCaption" class="edit-textarea" placeholder="Describe your outfit..."></textarea>
                         </div>
-                    </div>
 
-                    <div class="form-section">
-                        <label for="editCaption">Caption</label>
-                        <textarea id="editCaption" placeholder="Describe your outfit..."></textarea>
-                    </div>
+                        <!-- Tags Section -->
+                        <div class="view-post-section">
+                            <h4>Tags</h4>
+                            
+                            <div class="tag-category">
+                                <h5>Gender</h5>
+                                <div class="tag-options" id="editGenderTags">
+                                    <div class="tag-option" data-tag="Men">Men</div>
+                                    <div class="tag-option" data-tag="Women">Women</div>
+                                </div>
+                            </div>
 
-                    <div class="tags-section">
-                        <h3>Style Tags</h3>
-                        
-                        <div class="tag-category">
-                            <h4>Gender</h4>
-                            <div class="tag-options" id="editGenderTags">
-                                <div class="tag-option" data-tag="Men">Men</div>
-                                <div class="tag-option" data-tag="Women">Women</div>
+                            <div class="tag-category">
+                                <h5>Style</h5>
+                                <div class="tag-options" id="editStyleTags">
+                                    <div class="tag-option" data-tag="Streetwear">Streetwear</div>
+                                    <div class="tag-option" data-tag="Date night">Date Night</div>
+                                    <div class="tag-option" data-tag="Beach">Beach</div>
+                                    <div class="tag-option" data-tag="Stockholm">Stockholm</div>
+                                    <div class="tag-option" data-tag="Old money">Old Money</div>
+                                    <div class="tag-option" data-tag="Gymwear">Gymwear</div>
+                                    <div class="tag-option" data-tag="Comfortable">Comfortable</div>
+                                </div>
+                            </div>
+
+                            <div class="tag-category">
+                                <h5>Season</h5>
+                                <div class="tag-options" id="editSeasonTags">
+                                    <div class="tag-option" data-tag="Winter">Winter</div>
+                                    <div class="tag-option" data-tag="Spring">Spring</div>
+                                    <div class="tag-option" data-tag="Summer">Summer</div>
+                                    <div class="tag-option" data-tag="Fall">Fall</div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="tag-category">
-                            <h4>Style</h4>
-                            <div class="tag-options" id="editStyleTags">
-                                <div class="tag-option" data-tag="Streetwear">Streetwear</div>
-                                <div class="tag-option" data-tag="Date night">Date Night</div>
-                                <div class="tag-option" data-tag="Beach">Beach</div>
-                                <div class="tag-option" data-tag="Stockholm">Stockholm</div>
-                                <div class="tag-option" data-tag="Old money">Old Money</div>
-                                <div class="tag-option" data-tag="Gymwear">Gymwear</div>
-                                <div class="tag-option" data-tag="Comfortable">Comfortable</div>
+                        <!-- Wardrobe Items Section -->
+                        <div class="view-post-section" id="taggedItemsSection">
+                            <h4>Tagged Wardrobe Items</h4>
+                            <div class="view-wardrobe-grid" id="taggedWardrobeGrid">
+                                <!-- Only currently tagged items will show here -->
                             </div>
                         </div>
 
-                        <div class="tag-category">
-                            <h4>Season</h4>
-                            <div class="tag-options" id="editSeasonTags">
-                                <div class="tag-option" data-tag="Winter">Winter</div>
-                                <div class="tag-option" data-tag="Spring">Spring</div>
-                                <div class="tag-option" data-tag="Summer">Summer</div>
-                                <div class="tag-option" data-tag="Fall">Fall</div>
+                        <div class="view-post-section">
+                            <button class="add-items-toggle" onclick="toggleAddItemsSection()" id="addItemsBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add/Remove Wardrobe Items
+                            </button>
+                            <div class="add-items-section" id="addItemsSection" style="display: none;">
+                                <div class="view-wardrobe-grid" id="editWardrobeGrid">
+                                    <!-- All wardrobe items will be loaded here -->
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Engagement Stats Section -->
+                        <div class="view-post-section" id="engagementSection">
+                            <h4>Engagement</h4>
+                            <div class="view-post-stats" id="postStats">
+                                <!-- Stats will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Posted By Section -->
+                        <div class="view-post-section" id="postedBySection">
+                            <!-- Will be populated dynamically -->
+                        </div>
+
+                        <!-- Posted On Section -->
+                        <div class="view-post-section" id="postedOnSection">
+                            <!-- Will be populated dynamically -->
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
-                <button class="btn btn-save" id="saveEditBtn" onclick="savePostEdit()">Save Changes</button>
+                <div class="view-modal-footer">
+                    <button class="btn btn-delete" onclick="deletePostFromModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                        Delete Post
+                    </button>
+                    <div style="flex: 1;"></div>
+                    <button class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button class="btn btn-save" id="saveEditBtn" onclick="savePostEdit()">Save Changes</button>
+                </div>
             </div>
         </div>
     </div>

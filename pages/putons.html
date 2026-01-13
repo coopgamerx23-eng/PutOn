@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Put Ons - PutOn</title>
+  <link rel="stylesheet" href="/assets/css/putons.css">
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="putons-root">
+    <div class="putons-container">
+      <!-- Header -->
+      <div class="putons-header">
+        <h1 class="putons-title">My Put Ons</h1>
+        <p class="putons-subtitle">Save items you want to try in your next outfit</p>
+      </div>
+
+      <!-- Search and Add Bar -->
+      <div class="search-bar">
+        <div class="search-controls">
+          <input id="search-input" class="search-input" type="text" placeholder="Search Put Ons...">
+          <select id="category-filter" class="category-select">
+            <option value="all">All Categories</option>
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="dresses">Dresses</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="shoes">Shoes</option>
+            <option value="accessories">Accessories</option>
+          </select>
+          <button onclick="openModal()" class="add-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add Item
+          </button>
+        </div>
+      </div>
+
+      <!-- Put Ons Grid -->
+      <div id="putons-view" class="putons-grid"></div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <p class="empty-title">No Put Ons yet</p>
+        <p class="empty-message">Start adding items you want to try in your outfits!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div id="add-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add to Put Ons</h2>
+        <button onclick="closeModal()" class="close-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Image Upload/URL -->
+        <div class="form-group">
+          <label class="form-label">Item Image</label>
+          <input type="file" id="image-upload" accept="image/*" onchange="handleImageUpload(event)" class="form-input"/>
+          <p style="text-align: center; margin: 10px 0; color: #666;">or</p>
+          <input type="url" id="image-url-input" placeholder="Paste image URL..." onchange="handleImageUrl(event)" class="form-input"/>
+        </div>
+
+        <!-- Image Preview -->
+        <div id="image-preview-container" class="image-preview-container hidden">
+          <img id="image-preview" src="" alt="Preview" class="image-preview" />
+        </div>
+
+        <!-- Item Details -->
+        <div class="form-group">
+          <label class="form-label">Item Name *</label>
+          <input type="text" id="item-name" placeholder="e.g., Black Leather Jacket" class="form-input" required/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select id="item-category" class="form-select" required>
+            <option value="">Select category...</option>
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="dresses">Dresses</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="shoes">Shoes</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Brand</label>
+          <input type="text" id="item-brand" placeholder="e.g., Nike" class="form-input"/>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price</label>
+            <input type="text" id="item-price" placeholder="$99.99" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <input type="text" id="item-color" placeholder="Black" class="form-input"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Size</label>
+          <input type="text" id="item-size" placeholder="M, 32, etc." class="form-input"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea id="item-notes" placeholder="Any additional notes..." class="form-textarea" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="closeModal()" class="btn-cancel">Cancel</button>
+        <button onclick="saveItem()" class="btn-save">Add to Put Ons</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="create-account-page-placeholder"></div>
+
+  <script type="module" src="/assets/js/pages/page-defaults.js"></script>
+  <script src="/assets/js/pages/putons.js"></script>
+  <script type="module" src="/assets/js/components/load-user.js"></script>
+</body>
+</html>

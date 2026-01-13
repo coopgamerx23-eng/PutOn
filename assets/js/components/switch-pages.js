@@ -5,7 +5,7 @@ document.getElementById('header-placeholder').innerHTML = data;
 
 const header_buttons = document.querySelectorAll(".new-page-button")
 const pages = ["homepage.html", "explore.html", "build-outfit.html", "virtual-wardrobe.html", 
-        "wishlist.html", "find-item.html", "sales-discounts.html"
+        "putons.html", "find-item.html", "sales-discounts.html"
 ]
 
 header_buttons.forEach((el, i) => {

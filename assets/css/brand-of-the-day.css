@@ -1,0 +1,406 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #7fa896 0%, #92b5a3 50%, #7fa896 100%);
+    min-height: 100vh;
+}
+
+.container {
+    padding-top: 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #2d5a46;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    font-size: 18px;
+    color: #4a6b5a;
+}
+
+/* Filters Section */
+.filters-section {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 40px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 16px rgba(45, 90, 70, 0.1);
+}
+
+.filter-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d5a46;
+}
+
+.filter-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3a5a4a;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: #2d5a46;
+}
+
+.filter-btn.active {
+    background: #2d5a46;
+    color: white;
+    border-color: #2d5a46;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    margin-left: auto;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    color: #2d5a46;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #2d5a46;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.search-box input::placeholder {
+    color: #5a7a6a;
+}
+
+/* Brand of the Week - Featured */
+.featured-brand {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(45, 90, 70, 0.15);
+    position: relative;
+}
+
+.featured-brand:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(45, 90, 70, 0.25);
+}
+
+.featured-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: #2d5a46;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(45, 90, 70, 0.3);
+}
+
+.featured-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.featured-info {
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.featured-logo {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    color: #2d5a46;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.featured-info h2 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #2d5a46;
+    margin-bottom: 8px;
+}
+
+.featured-category {
+    font-size: 18px;
+    color: #5a7a6a;
+    margin-bottom: 20px;
+}
+
+.featured-description {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #3a5a4a;
+    margin-bottom: 24px;
+}
+
+.featured-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.featured-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.featured-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d5a46;
+}
+
+.featured-stat-label {
+    font-size: 14px;
+    color: #5a7a6a;
+}
+
+.featured-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: rgba(45, 90, 70, 0.1);
+}
+
+.featured-preview-item {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+}
+
+.featured-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.featured-brand:hover .featured-preview-item img {
+    transform: scale(1.05);
+}
+
+/* Regular Brands Grid */
+.brands-section-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d5a46;
+    margin-bottom: 24px;
+}
+
+.brands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.brand-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(45, 90, 70, 0.1);
+}
+
+.brand-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(45, 90, 70, 0.2);
+}
+
+.brand-card-header {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 2px solid rgba(45, 90, 70, 0.1);
+}
+
+.brand-logo {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d5a46;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brand-header-info {
+    flex: 1;
+}
+
+.brand-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d5a46;
+    margin-bottom: 4px;
+}
+
+.brand-category {
+    font-size: 14px;
+    color: #5a7a6a;
+}
+
+.brand-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: rgba(45, 90, 70, 0.1);
+}
+
+.brand-preview-item {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+}
+
+.brand-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.brand-card:hover .brand-preview-item img {
+    transform: scale(1.05);
+}
+
+.brand-footer {
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand-points {
+    font-size: 14px;
+    color: #5a7a6a;
+}
+
+.brand-points strong {
+    color: #2d5a46;
+    font-weight: 700;
+}
+
+.view-brand-btn {
+    padding: 8px 20px;
+    background: #2d5a46;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-brand-btn:hover {
+    background: #234534;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+    .brands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .featured-content {
+    grid-template-columns: 1fr;
+    }
+
+    .featured-info {
+    padding: 40px 30px;
+    }
+
+    .featured-info h2 {
+    font-size: 36px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header h1 {
+    font-size: 32px;
+    }
+
+    .filters-section {
+    padding: 16px;
+    }
+
+    .search-box {
+    width: 100%;
+    margin-left: 0;
+    }
+
+    .brands-grid {
+    grid-template-columns: 1fr;
+    }
+
+    .featured-info {
+    padding: 30px 20px;
+    }
+
+    .featured-info h2 {
+    font-size: 28px;
+    }
+
+    .featured-logo {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+    }
+}

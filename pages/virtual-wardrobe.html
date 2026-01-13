@@ -376,6 +376,72 @@
     </div>
   </div>
 
+  <div id="edit-outfit-modal" class="modal-overlay hidden">
+    <div class="modal-content edit-outfit-modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Outfit</h2>
+        <button id="close-edit-outfit-modal-btn" class="close-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      
+      <div class="edit-outfit-body">
+        <!-- Outfit Name -->
+        <div class="form-group">
+          <label class="form-label">Outfit Name</label>
+          <input type="text" id="edit-outfit-name" class="form-input" placeholder="My Awesome Outfit" />
+        </div>
+        
+        <!-- Cover Image Section -->
+        <div class="cover-image-section">
+          <h3 class="section-title" style="margin: 0; font-size: 16px; color: #2a7f62;">Cover Image</h3>
+          <div id="cover-image-preview" class="cover-image-preview empty">
+            No cover image
+          </div>
+          <div class="cover-image-actions">
+            <label for="outfit-cover-input" class="cover-upload-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              Upload Cover
+            </label>
+            <input type="file" id="outfit-cover-input" class="cover-upload-input" accept="image/*" />
+            <button id="remove-cover-btn" class="remove-cover-btn" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              Remove
+            </button>
+          </div>
+        </div>
+        
+        <!-- Current Items in Outfit -->
+        <div class="editing-section">
+          <h3 class="section-title">Current Items</h3>
+          <div id="editing-outfit-items" class="editing-outfit-items-grid">
+            <!-- Items will be rendered here -->
+          </div>
+        </div>
+        
+        <!-- Available Wardrobe Items -->
+        <div class="editing-section">
+          <h3 class="section-title">Add Items from Wardrobe</h3>
+          <input 
+            type="text" 
+            id="edit-outfit-search" 
+            class="form-input" 
+            placeholder="Search wardrobe items..." 
+            style="margin-bottom: 15px;"
+          />
+          <div id="available-wardrobe-items" class="available-items-grid">
+            <!-- Available items will be rendered here -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button id="cancel-edit-outfit-btn" class="btn-cancel">Cancel</button>
+        <button id="save-edit-outfit-btn" class="btn-save">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/assets/js/pages/page-defaults.js"></script>
   <script type="module" src="/assets/js/pages/virtual-wardrobe.js"></script>
   <script type="module" src="/assets/js/components/load-user.js"></script>

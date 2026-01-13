@@ -211,6 +211,7 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     perspective: 1000px;
+    justify-items: center;
 
     /* scrolling lives here */
     overflow-y: auto;
@@ -235,6 +236,8 @@ body {
     cursor: pointer;
     transition: all 0.5s;
     user-select: none;
+    width: 100%;
+    max-width: 220px;
 }
 
 .post-item:hover {
@@ -267,6 +270,8 @@ body {
     position: relative;
     aspect-ratio: 3/4;
     perspective: 800px;
+    width: 100%;
+    max-width: 220px;
 }
 
 .canvas {
@@ -517,45 +522,8 @@ body {
     backdrop-filter: blur(4px);
 }
 
-.edit-post-btn:hover {
-    background: rgba(25, 118, 210, 1) !important;
-    transform: scale(1.1);
-}
-
-.edit-post-btn:active {
-    transform: scale(0.95);
-}
-
 .post-item:hover .post-overlay {
     opacity: 1;
-}
-
-.delete-post-btn {
-    background: rgba(220, 38, 38, 0.9);
-    border: 2px solid white;
-    color: white;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.delete-post-btn:hover {
-    background: rgba(185, 28, 28, 1);
-    transform: scale(1.1);
-}
-
-.delete-post-btn:active {
-    transform: scale(0.95);
-}
-
-.delete-post-btn svg {
-    stroke: white;
 }
 
 /* Empty posts message */
@@ -637,11 +605,6 @@ body {
     
     .posts-grid {
         grid-template-columns: 1fr;
-    }
-    
-    .delete-post-btn {
-        width: 40px;
-        height: 40px;
     }
 }
 
@@ -1048,35 +1011,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Edit button styles */
-.edit-post-btn {
-    background: rgba(33, 150, 243, 0.9);
-    border: 2px solid white;
-    color: white;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.edit-post-btn:hover {
-    background: rgba(25, 118, 210, 1);
-    transform: scale(1.1);
-}
-
-.edit-post-btn:active {
-    transform: scale(0.95);
-}
-
-.edit-post-btn svg {
-    stroke: white;
-}
-
 /* Update post overlay to show both buttons */
 .post-overlay {
     position: absolute;
@@ -1115,5 +1049,295 @@ body {
 
     .edit-post-modal .wardrobe-items-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+}
+
+/* Add this to your account-settings.css file */
+
+/* View Post Modal Styles */
+.view-post-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.view-post-modal.active {
+    display: flex;
+}
+
+.view-modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 1200px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.view-modal-left {
+    flex: 1;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    max-width: 60%;
+}
+
+.view-modal-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.view-modal-right {
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.view-modal-header {
+    padding: 24px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-modal-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.btn-delete {
+    background: #dc2626;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btn-delete:active {
+    transform: translateY(0);
+}
+
+/* Update the footer to space buttons properly */
+.view-modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.close-view-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.close-view-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.view-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.view-post-section {
+    margin-bottom: 24px;
+}
+
+.view-post-section h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.view-post-caption {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.view-post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.view-tag {
+    padding: 6px 14px;
+    background: #f0f0f0;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+}
+
+.view-wardrobe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.view-wardrobe-item {
+    background: #fafafa;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.view-wardrobe-item:hover {
+    border-color: #2a7f62;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(42, 127, 98, 0.2);
+}
+
+.view-wardrobe-item img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+}
+
+.view-wardrobe-info {
+    padding: 10px;
+}
+
+.view-wardrobe-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.view-wardrobe-details {
+    font-size: 11px;
+    color: #777;
+}
+
+.view-post-stats {
+    display: flex;
+    gap: 20px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 12px;
+}
+
+.view-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.view-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2a7f62;
+}
+
+.view-stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.loading-spinner .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #2a7f62;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.empty-view-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .view-modal-content {
+        flex-direction: column;
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .view-modal-left {
+        max-width: 100%;
+        max-height: 50vh;
+    }
+
+    .view-modal-right {
+        flex: 1;
+    }
+
+    .view-wardrobe-grid {
+        grid-template-columns: 1fr;
     }
 }

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Followers & Following - PutOn</title>
+  <link rel="stylesheet" href="/assets/css/follow-page.css">
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="container">
+    <a href="/pages/account-settings.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Settings
+    </a>
+
+    <div class="page-header">
+      <h1 id="pageTitle">Followers & Following</h1>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="followers">
+        Followers <span id="followersCount">(0)</span>
+      </button>
+      <button class="tab-btn" data-tab="following">
+        Following <span id="followingCount">(0)</span>
+      </button>
+    </div>
+
+    <div class="users-list" id="usersList">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/assets/js/pages/page-defaults.js"></script>
+  <script>
+    let currentTab = 'followers';
+    let currentUserId = null;
+    let viewingUserId = null; // The user whose followers/following we're viewing
+
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlTab = urlParams.get('tab');
+    const urlUserId = urlParams.get('userId');
+
+    if (urlTab) {
+      currentTab = urlTab;
+    }
+
+    // Get current logged-in user
+    async function getCurrentUser() {
+      try {
+        const response = await fetch('/check-login', { credentials: 'include' });
+        const data = await response.json();
+        if (data.loggedIn) {
+          currentUserId = data.user.id;
+          return data.user.id;
+        }
+        return null;
+      } catch (error) {
+        console.error('Error getting current user:', error);
+        return null;
+      }
+    }
+
+    // Load followers
+    async function loadFollowers() {
+      const usersList = document.getElementById('usersList');
+      usersList.innerHTML = `
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading followers...</p>
+        </div>
+      `;
+
+      try {
+        const endpoint = viewingUserId ? `/api/followers/${viewingUserId}` : '/api/followers';
+        const response = await fetch(endpoint, { credentials: 'include' });
+        const data = await response.json();
+
+        if (data.success && data.followers.length > 0) {
+          document.getElementById('followersCount').textContent = `(${data.followers.length})`;
+          usersList.innerHTML = data.followers.map(user => `
+            <div class="follower-user-card" onclick="window.location.href='/pages/profile.html?userId=${user.id}'">
+              <img class="follower-user-avatar" 
+                   src="${user.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2a7f62&color=fff&size=200`}" 
+                   alt="${user.name}">
+              <div class="follower-user-info">
+                <div class="follower-user-name">${user.name}</div>
+                <div class="follower-user-username">@${user.username}</div>
+                ${user.bio ? `<div class="follower-user-bio">${user.bio}</div>` : ''}
+              </div>
+              ${currentUserId && user.id !== currentUserId ? `
+                <button class="follow-btn ${user.isFollowing ? 'following' : ''}" 
+                        onclick="event.stopPropagation(); toggleFollow(${user.id}, this)">
+                  ${user.isFollowing ? 'Following' : 'Follow Back'}
+                </button>
+              ` : ''}
+            </div>
+          `).join('');
+        } else {
+          usersList.innerHTML = `
+            <div class="empty-state">
+              <h3>No Followers Yet</h3>
+              <p>When people follow you, they'll appear here</p>
+            </div>
+          `;
+          document.getElementById('followersCount').textContent = '(0)';
+        }
+      } catch (error) {
+        console.error('Error loading followers:', error);
+        usersList.innerHTML = `
+          <div class="empty-state">
+            <h3>Error Loading Followers</h3>
+            <p>Please try again later</p>
+          </div>
+        `;
+      }
+    }
+
+    // Load following
+    async function loadFollowing() {
+      const usersList = document.getElementById('usersList');
+      usersList.innerHTML = `
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading following...</p>
+        </div>
+      `;
+
+      try {
+        const endpoint = viewingUserId ? `/api/following/${viewingUserId}` : '/api/following';
+        const response = await fetch(endpoint, { credentials: 'include' });
+        const data = await response.json();
+
+        if (data.success && data.following.length > 0) {
+          document.getElementById('followingCount').textContent = `(${data.following.length})`;
+          usersList.innerHTML = data.following.map(user => `
+            <div class="follower-user-card" onclick="window.location.href='/pages/profile.html?userId=${user.id}'">
+              <img class="follower-user-avatar" 
+                   src="${user.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2a7f62&color=fff&size=200`}" 
+                   alt="${user.name}">
+              <div class="follower-user-info">
+                <div class="follower-user-name">${user.name}</div>
+                <div class="follower-user-username">@${user.username}</div>
+                ${user.bio ? `<div class="follower-user-bio">${user.bio}</div>` : ''}
+              </div>
+              ${currentUserId && user.id !== currentUserId ? `
+                <button class="follow-btn ${user.isFollowing ? 'following' : ''}" 
+                        onclick="event.stopPropagation(); toggleFollow(${user.id}, this)">
+                  ${user.isFollowing ? 'Following' : 'Follow'}
+                </button>
+              ` : ''}
+            </div>
+          `).join('');
+        } else {
+          usersList.innerHTML = `
+            <div class="empty-state">
+              <h3>Not Following Anyone</h3>
+              <p>Start following people to see their content</p>
+            </div>
+          `;
+          document.getElementById('followingCount').textContent = '(0)';
+        }
+      } catch (error) {
+        console.error('Error loading following:', error);
+        usersList.innerHTML = `
+          <div class="empty-state">
+            <h3>Error Loading Following</h3>
+            <p>Please try again later</p>
+          </div>
+        `;
+      }
+    }
+
+    // Toggle follow
+    async function toggleFollow(userId, button) {
+      const isFollowing = button.classList.contains('following');
+      const action = isFollowing ? 'unfollow' : 'follow';
+
+      try {
+        const response = await fetch('/api/follow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ userId, action })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          button.classList.toggle('following');
+          button.textContent = isFollowing ? (currentTab === 'followers' ? 'Follow Back' : 'Follow') : 'Following';
+          
+          // Reload current tab to update counts
+          if (currentTab === 'followers') {
+            loadFollowers();
+          } else {
+            loadFollowing();
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling follow:', error);
+      }
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+
+        if (currentTab === 'followers') {
+          loadFollowers();
+        } else {
+          loadFollowing();
+        }
+      });
+    });
+
+    // Initialize
+    (async () => {
+      await getCurrentUser();
+      viewingUserId = urlUserId ? parseInt(urlUserId) : currentUserId;
+      
+      // Set active tab
+      if (currentTab === 'following') {
+        document.querySelector('[data-tab="following"]').classList.add('active');
+        document.querySelector('[data-tab="followers"]').classList.remove('active');
+      }
+      
+      // Load appropriate tab
+      if (currentTab === 'followers') {
+        loadFollowers();
+      } else {
+        loadFollowing();
+      }
+    })();
+
+    // Make toggleFollow available globally
+    window.toggleFollow = toggleFollow;
+  </script>
+</body>
+</html>

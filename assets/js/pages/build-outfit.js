@@ -1,12 +1,203 @@
 // Drag and Drop Functionality
 let draggedItem = null;
 
+// Pagination state with active filters
+const paginationState = {
+    yourPieces: { 
+        currentPage: 1, 
+        itemsPerPage: 5, 
+        totalItems: 0, 
+        allItems: [],
+        activeFilter: 'all' // Add filter state
+    },
+    putOns: { 
+        currentPage: 1, 
+        itemsPerPage: 5, 
+        totalItems: 0, 
+        allItems: [],
+        activeFilter: 'all' // Add filter state
+    }
+};
+
+// ========================================
+// PAGINATION HELPERS
+// ========================================
+function getFilteredItems(section) {
+    const state = paginationState[section];
+    const filter = state.activeFilter;
+    
+    if (filter === 'all') {
+        return state.allItems;
+    }
+    
+    // Filter items by category
+    return state.allItems.filter(item => {
+        const category = mapTypeToCategory(item.type);
+        return category === filter;
+    });
+}
+
+function getTotalPages(section) {
+    const filteredItems = getFilteredItems(section);
+    return Math.ceil(filteredItems.length / paginationState[section].itemsPerPage);
+}
+
+function getPageItems(section) {
+    const state = paginationState[section];
+    const filteredItems = getFilteredItems(section);
+    const start = (state.currentPage - 1) * state.itemsPerPage;
+    const end = start + state.itemsPerPage;
+    return filteredItems.slice(start, end);
+}
+
+function updatePaginationControls(section, gridId) {
+    const totalPages = getTotalPages(section);
+    const currentPage = paginationState[section].currentPage;
+    const filteredItems = getFilteredItems(section);
+    const totalItems = filteredItems.length;
+    
+    const card = document.querySelector(`#${gridId}`).closest('.collection-card');
+    const paginationControls = card.querySelector('.pagination-controls');
+    const prevBtn = card.querySelector('.prev-btn');
+    const nextBtn = card.querySelector('.next-btn');
+    const pageInfo = card.querySelector('.pagination-info');
+    
+    // Hide pagination if 5 or fewer items
+    if (totalItems <= 5) {
+        if (paginationControls) paginationControls.style.display = 'none';
+    } else {
+        if (paginationControls) paginationControls.style.display = 'flex';
+        if (prevBtn) prevBtn.disabled = currentPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        if (pageInfo) pageInfo.textContent = `${currentPage} / ${totalPages || 1}`;
+    }
+}
+
+function renderPage(section, gridId) {
+    const grid = document.getElementById(gridId);
+    const items = getPageItems(section);
+    
+    grid.classList.add('page-transitioning');
+    
+    setTimeout(() => {
+        grid.innerHTML = '';
+        
+        if (items.length === 0) {
+            const filter = paginationState[section].activeFilter;
+            let message;
+            
+            if (filter === 'all') {
+                message = section === 'yourPieces' 
+                    ? 'No wardrobe items yet. Add items from the Virtual Wardrobe page!'
+                    : 'No items yet. Add items from the Explore page!';
+            } else {
+                message = `No ${filter} items found.`;
+            }
+            
+            grid.innerHTML = `
+                <p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                    ${message}
+                </p>`;
+        } else {
+            items.forEach(item => {
+                const itemCard = createItemCard(item);
+                grid.appendChild(itemCard);
+            });
+            initializeDragHandlers();
+        }
+        
+        grid.classList.remove('page-transitioning');
+        updatePaginationControls(section, gridId);
+    }, 150);
+}
+
+function changePage(section, gridId, direction) {
+    const totalPages = getTotalPages(section);
+    const newPage = paginationState[section].currentPage + direction;
+    
+    if (newPage >= 1 && newPage <= totalPages) {
+        paginationState[section].currentPage = newPage;
+        renderPage(section, gridId);
+    }
+}
+
+// ========================================
+// FILTER FUNCTIONALITY (FIXED)
+// ========================================
+function applyFilter(section, gridId, category) {
+    // Update the active filter in state
+    paginationState[section].activeFilter = category;
+    
+    // Reset to page 1 when filter changes
+    paginationState[section].currentPage = 1;
+    
+    // Re-render with the new filter
+    renderPage(section, gridId);
+}
+
+// ========================================
+// LOAD WARDROBE ITEMS
+// ========================================
+async function loadWardrobeItems() {
+    try {
+        console.log('🔍 Loading Wardrobe items from database...');
+
+        const res = await fetch('http://localhost:3000/api/wardrobe', {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server error ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log('✅ Loaded wardrobe items:', data);
+
+        if (!data.success || !Array.isArray(data.items)) {
+            paginationState.yourPieces.allItems = [];
+            paginationState.yourPieces.totalItems = 0;
+            renderPage('yourPieces', 'yourPieces');
+            return;
+        }
+
+        // Format items
+        const formattedItems = data.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            type: item.category,
+            image: item.image,
+            brand: item.brand,
+            color: item.color,
+            size: item.size,
+            price: item.price
+        }));
+
+        paginationState.yourPieces.allItems = formattedItems;
+        paginationState.yourPieces.totalItems = formattedItems.length;
+        
+        // Keep current filter but reset to page 1
+        const currentFilter = paginationState.yourPieces.activeFilter;
+        paginationState.yourPieces.currentPage = 1;
+        
+        renderPage('yourPieces', 'yourPieces');
+        
+        // Restore active filter button state
+        restoreFilterState('yourPieces', currentFilter);
+
+    } catch (err) {
+        console.error('❌ Error loading wardrobe items:', err);
+        paginationState.yourPieces.allItems = [];
+        paginationState.yourPieces.totalItems = 0;
+        renderPage('yourPieces', 'yourPieces');
+    }
+}
+
 // ========================================
 // LOAD SAVED ITEMS FROM DATABASE
 // ========================================
 async function loadPutOns() {
     try {
-        const putOnsGrid = document.getElementById('putOns');
         console.log('🔍 Loading Put-Ons from database...');
 
         const res = await fetch('http://localhost:3000/api/putons', {
@@ -21,29 +212,48 @@ async function loadPutOns() {
         const data = await res.json();
         console.log('✅ Loaded from DB:', data);
 
-        if (!data.success || !Array.isArray(data.items) || data.items.length === 0) {
-            putOnsGrid.innerHTML = `
-                <p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
-                    No items yet. Add items from the Explore page!
-                </p>`;
+        if (!data.success || !Array.isArray(data.items)) {
+            paginationState.putOns.allItems = [];
+            paginationState.putOns.totalItems = 0;
+            renderPage('putOns', 'putOns');
             return;
         }
 
-        putOnsGrid.innerHTML = '';
-        data.items.forEach(item => {
-            const itemCard = createItemCard(item);
-            putOnsGrid.appendChild(itemCard);
-        });
-
-        initializeDragHandlers();
+        paginationState.putOns.allItems = data.items;
+        paginationState.putOns.totalItems = data.items.length;
+        
+        // Keep current filter but reset to page 1
+        const currentFilter = paginationState.putOns.activeFilter;
+        paginationState.putOns.currentPage = 1;
+        
+        renderPage('putOns', 'putOns');
+        
+        // Restore active filter button state
+        restoreFilterState('putOns', currentFilter);
 
     } catch (err) {
         console.error('❌ Error loading Put-Ons:', err);
-        document.getElementById('putOns').innerHTML = `
-            <p style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
-                Failed to load Put-Ons. Please try again later.
-            </p>`;
+        paginationState.putOns.allItems = [];
+        paginationState.putOns.totalItems = 0;
+        renderPage('putOns', 'putOns');
     }
+}
+
+// ========================================
+// RESTORE FILTER BUTTON STATE
+// ========================================
+function restoreFilterState(section, activeFilter) {
+    const gridId = section === 'yourPieces' ? 'yourPieces' : 'putOns';
+    const card = document.querySelector(`#${gridId}`).closest('.collection-card');
+    const filterBtns = card.querySelectorAll('.filter-btn');
+    
+    filterBtns.forEach(btn => {
+        if (btn.dataset.category === activeFilter) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
 }
 
 // ========================================
@@ -57,12 +267,6 @@ function createItemCard(item) {
     const category = mapTypeToCategory(item.type);
     card.dataset.category = category;
     card.dataset.item = item.id || item.name.toLowerCase().replace(/\s+/g, '-');
-    
-    console.log('📦 Created card:', {
-        name: item.name,
-        originalType: item.type,
-        mappedCategory: category
-    });
     
     const img = document.createElement('img');
     const imageUrl = item.imageData || item.imageSrc || item.sourceImage || item.image;
@@ -102,73 +306,27 @@ function createItemCard(item) {
 // MAP CLOTHING TYPE TO CATEGORY
 // ========================================
 function mapTypeToCategory(type) {
-    if (!type) {
-        console.warn('⚠️ No type provided, defaulting to shirt');
-        return 'shirt';
-    }
+    if (!type) return 'shirt';
     
     const lowerType = type.toLowerCase().trim();
-    console.log('🔍 Mapping type:', lowerType);
     
-    // Map based on the exact types from your server's CLOTHING_CATEGORIES
     const typeMap = {
-        // Outerwear
-        'jacket': 'outerwear',
-        'coat': 'outerwear',
-        'hoodie': 'outerwear',
-        'sweater': 'outerwear',
-        'blazer': 'outerwear',
-        'cardigan': 'outerwear',
-        'outerwear': 'outerwear',
-        
-        // Shirts/Tops
-        't-shirt': 'shirt',
-        'shirt': 'shirt',
-        'blouse': 'shirt',
-        'top': 'shirt',
-        'tank': 'shirt',
-        'tank top': 'shirt',
-        
-        // Pants/Bottoms
-        'jeans': 'pants',
-        'pants': 'pants',
-        'trousers': 'pants',
-        'shorts': 'pants',
-        'skirt': 'pants',
-        'bottom': 'pants',
-        
-        // Dress
-        'dress': 'pants', // Map dress to pants slot or you can create a dress slot
-        'gown': 'pants',
-        
-        // Shoes
-        'sneakers': 'shoes',
-        'boots': 'shoes',
-        'shoes': 'shoes',
-        'sandals': 'shoes',
-        'footwear': 'shoes',
-        
-        // Accessories
-        'hat': 'accessories',
-        'cap': 'accessories',
-        'bag': 'accessories',
-        'watch': 'accessories',
-        'sunglasses': 'accessories',
-        'glasses': 'accessories',
-        'scarf': 'accessories',
-        'jewelry': 'accessories',
-        'accessories': 'accessories'
+        'top': 'shirt', 'bottom': 'pants', 'footwear': 'shoes',
+        'outerwear': 'outerwear', 'dress': 'pants', 'accessories': 'accessories',
+        'tops': 'shirt', 'bottoms': 'pants', 'dresses': 'pants',
+        'jacket': 'outerwear', 'coat': 'outerwear', 'hoodie': 'outerwear',
+        'sweater': 'outerwear', 'blazer': 'outerwear', 'cardigan': 'outerwear',
+        't-shirt': 'shirt', 'shirt': 'shirt', 'blouse': 'shirt',
+        'tank': 'shirt', 'tank top': 'shirt', 'tee': 'shirt',
+        'jeans': 'pants', 'pants': 'pants', 'trousers': 'pants',
+        'shorts': 'pants', 'skirt': 'pants', 'gown': 'pants',
+        'sneakers': 'shoes', 'boots': 'shoes', 'shoes': 'shoes', 'sandals': 'shoes',
+        'hat': 'accessories', 'cap': 'accessories', 'bag': 'accessories',
+        'watch': 'accessories', 'sunglasses': 'accessories', 'glasses': 'accessories',
+        'scarf': 'accessories', 'jewelry': 'accessories'
     };
     
-    const category = typeMap[lowerType];
-    
-    if (!category) {
-        console.warn(`⚠️ Unknown type "${type}", defaulting to shirt`);
-        return 'shirt';
-    }
-    
-    console.log(`✅ Mapped "${type}" → "${category}"`);
-    return category;
+    return typeMap[lowerType] || 'shirt';
 }
 
 // ========================================
@@ -187,7 +345,19 @@ async function deleteItem(itemId, cardElement) {
         cardElement.style.transition = 'all 0.3s ease';
         cardElement.style.transform = 'scale(0)';
         cardElement.style.opacity = '0';
-        setTimeout(() => cardElement.remove(), 300);
+        setTimeout(() => {
+            // Remove from state
+            paginationState.putOns.allItems = paginationState.putOns.allItems.filter(item => item.id !== itemId);
+            paginationState.putOns.totalItems = paginationState.putOns.allItems.length;
+            
+            // Adjust current page if needed
+            const totalPages = getTotalPages('putOns');
+            if (paginationState.putOns.currentPage > totalPages && totalPages > 0) {
+                paginationState.putOns.currentPage = totalPages;
+            }
+            
+            renderPage('putOns', 'putOns');
+        }, 300);
 
         console.log('✅ Item deleted from database');
     } catch (err) {
@@ -220,7 +390,7 @@ function initializeDragHandlers() {
 }
 
 // ========================================
-// SLOT DROP EVENTS - WITH CATEGORY MATCHING
+// SLOT DROP EVENTS
 // ========================================
 const outfitSlots = document.querySelectorAll('.outfit-slot');
 
@@ -232,12 +402,6 @@ outfitSlots.forEach(slot => {
         if (draggedItem) {
             const itemCategory = draggedItem.dataset.category;
             const slotType = slot.dataset.slot;
-            
-            console.log('🎯 Drag over:', {
-                itemCategory: itemCategory,
-                slotType: slotType,
-                matches: itemCategory === slotType
-            });
             
             if (itemCategory === slotType) {
                 slot.classList.add('drag-over');
@@ -258,7 +422,6 @@ outfitSlots.forEach(slot => {
             const slotType = slot.dataset.slot;
             
             if (itemCategory !== slotType) {
-                console.log(`❌ Cannot drop ${itemCategory} into ${slotType} slot`);
                 showNotification(`This item doesn't fit in the ${slotType} slot!`, 'error');
                 return;
             }
@@ -272,17 +435,16 @@ outfitSlots.forEach(slot => {
             const itemImg = draggedItem.querySelector('img');
             const itemId = draggedItem.dataset.item;
             const itemName = draggedItem.querySelector('.item-name').textContent;
-            const itemImageSrc = itemImg.src; // Get the actual item image
+            const itemImageSrc = itemImg.src;
             
             if (itemImg) {
                 const newImg = itemImg.cloneNode(true);
                 newImg.classList.add('slot-item');
                 newImg.dataset.itemId = itemId;
                 newImg.dataset.itemName = itemName;
-                newImg.dataset.itemImage = itemImageSrc; // Store the item's actual image
+                newImg.dataset.itemImage = itemImageSrc;
                 slot.appendChild(newImg);
                 slot.classList.add('has-item');
-                console.log(`✅ Added ${itemCategory} to ${slotType} slot (ID: ${itemId})`);
             }
         }
     });
@@ -302,32 +464,6 @@ outfitSlots.forEach(slot => {
                 slot.appendChild(placeholder);
             }
         }
-    });
-});
-
-// ========================================
-// FILTER FUNCTIONALITY
-// ========================================
-const filterBtns = document.querySelectorAll('.filter-btn');
-
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const parent = btn.closest('.collection-card');
-        const btns = parent.querySelectorAll('.filter-btn');
-        const grid = parent.querySelector('.items-grid');
-        const category = btn.dataset.category;
-        
-        btns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        const items = grid.querySelectorAll('.item-card');
-        items.forEach(item => {
-            if (category === 'all' || item.dataset.category === category) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
     });
 });
 
@@ -360,8 +496,6 @@ document.getElementById('saveOutfitBtn').addEventListener('click', async () => {
     const outfitName = prompt('Give your outfit a name:', 'My Awesome Outfit');
     if (!outfitName || outfitName.trim() === '') return;
     
-    console.log('💾 Saving outfit:', { name: outfitName, items: outfitItems });
-    
     try {
         const response = await fetch('http://localhost:3000/api/outfits', {
             method: 'POST',
@@ -389,7 +523,7 @@ document.getElementById('saveOutfitBtn').addEventListener('click', async () => {
         }
     } catch (error) {
         console.error('❌ Error saving outfit:', error);
-        showNotification('Failed to save outfit. Please make sure the server endpoint exists.', 'error');
+        showNotification('Failed to save outfit.', 'error');
     }
 });
 
@@ -440,21 +574,119 @@ function showNotification(message, type = 'info') {
 }
 
 // ========================================
+// SETUP PAGINATION CONTROLS & FILTERS
+// ========================================
+function setupPaginationControls() {
+    // Your Pieces pagination
+    const yourPiecesCard = document.querySelector('#yourPieces').closest('.collection-card');
+    
+    const yourPiecesControls = document.createElement('div');
+    yourPiecesControls.className = 'pagination-controls';
+    yourPiecesControls.innerHTML = `
+        <button class="pagination-btn prev-btn" onclick="changePage('yourPieces', 'yourPieces', -1)">←</button>
+        <span class="pagination-info">1 / 1</span>
+        <button class="pagination-btn next-btn" onclick="changePage('yourPieces', 'yourPieces', 1)">→</button>
+    `;
+    yourPiecesCard.querySelector('.pagination-container').appendChild(yourPiecesControls);
+    
+    // Put-Ons pagination
+    const putOnsCard = document.querySelector('#putOns').closest('.collection-card');
+    
+    const putOnsControls = document.createElement('div');
+    putOnsControls.className = 'pagination-controls';
+    putOnsControls.innerHTML = `
+        <button class="pagination-btn prev-btn" onclick="changePage('putOns', 'putOns', -1)">←</button>
+        <span class="pagination-info">1 / 1</span>
+        <button class="pagination-btn next-btn" onclick="changePage('putOns', 'putOns', 1)">→</button>
+    `;
+    putOnsCard.querySelector('.pagination-container').appendChild(putOnsControls);
+}
+
+function setupFilterListeners() {
+    // Your Pieces filters
+    const yourPiecesCard = document.querySelector('#yourPieces').closest('.collection-card');
+    const yourPiecesFilters = yourPiecesCard.querySelectorAll('.filter-btn');
+    
+    yourPiecesFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const category = btn.dataset.category;
+            
+            // Update button states
+            yourPiecesFilters.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Apply filter
+            applyFilter('yourPieces', 'yourPieces', category);
+        });
+    });
+    
+    // Put-Ons filters (keep existing behavior for friends/ai)
+    const putOnsCard = document.querySelector('#putOns').closest('.collection-card');
+    const putOnsFilters = putOnsCard.querySelectorAll('.filter-btn');
+    
+    putOnsFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const category = btn.dataset.category;
+            
+            // Update button states
+            putOnsFilters.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // For now, just treat friends/ai as 'all'
+            // You can implement specific logic later
+            const filterCategory = (category === 'friends' || category === 'ai') ? 'all' : category;
+            applyFilter('putOns', 'putOns', filterCategory);
+        });
+    });
+}
+
+// Make functions globally accessible
+window.changePage = changePage;
+
+// ========================================
+// VIEW ALL OUTFITS BUTTON
+// ========================================
+function createViewOutfitsButton() {
+    const outfitCard = document.querySelector('.outfit-card');
+    
+    const viewOutfitsBtn = document.createElement('button');
+    viewOutfitsBtn.className = 'view-outfits-btn';
+    viewOutfitsBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        </svg>
+        View All Outfits
+    `;
+    
+    viewOutfitsBtn.addEventListener('click', () => {
+        window.location.href = '/pages/virtual-wardrobe.html?tab=outfits';
+    });
+    
+    outfitCard.appendChild(viewOutfitsBtn);
+}
+
+// ========================================
 // INITIALIZE ON PAGE LOAD
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎨 Build Outfit page loaded');
+    setupPaginationControls();
+    setupFilterListeners();
+    createViewOutfitsButton();
+    loadWardrobeItems();
     loadPutOns();
 });
 
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
         console.log('👁️ Page became visible, reloading items...');
+        loadWardrobeItems();
         loadPutOns();
     }
 });
 
 window.reloadPutOns = function() {
-    console.log('🔄 Manually reloading Put-Ons...');
+    console.log('🔄 Manually reloading items...');
+    loadWardrobeItems();
     loadPutOns();
 };

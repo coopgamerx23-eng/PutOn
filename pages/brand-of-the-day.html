@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Brands - PutOn</title>
+  <link rel="stylesheet" href="/assets/css/brand-of-the-day.css">
+</head>
+<body>
+      <div id="header-placeholder"></div>
+
+  <div class="overlay"></div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Explore Brands</h1>
+      <p>Discover and explore fashion brands curated by our community</p>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <span class="filter-label">Filter by:</span>
+      <div class="filter-group">
+        <button class="filter-btn active">Popular</button>
+        <button class="filter-btn">Streetwear</button>
+        <button class="filter-btn">Luxury</button>
+        <button class="filter-btn">Outdoor</button>
+        <button class="filter-btn">Sustainable</button>
+        <button class="filter-btn">Athletic</button>
+      </div>
+      <div class="search-box">
+        <input type="text" placeholder="Search brands...">
+      </div>
+    </div>
+
+    <!-- Brand of the Week - Featured -->
+    <div class="featured-brand" onclick="openBrandDetail('arcteryx')">
+      <div class="featured-badge">🏆 Brand of the Week</div>
+      <div class="featured-content">
+        <div class="featured-info">
+          <div class="featured-logo">A</div>
+          <h2>Arc'teryx</h2>
+          <p class="featured-category">Technical Performance Wear</p>
+          <p class="featured-description">
+            Canadian high-performance outdoor equipment company known for its technical apparel and climbing gear. 
+            From the mountains to urban streets, Arc'teryx represents the pinnacle of technical fashion.
+          </p>
+          <div class="featured-stats">
+            <div class="featured-stat">
+              <span class="featured-stat-value">12.5K</span>
+              <span class="featured-stat-label">Community Points</span>
+            </div>
+            <div class="featured-stat">
+              <span class="featured-stat-value">850</span>
+              <span class="featured-stat-label">Items Posted</span>
+            </div>
+          </div>
+        </div>
+        <div class="featured-preview">
+          <div class="featured-preview-item">
+            <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=500&fit=crop" alt="Product 1">
+          </div>
+          <div class="featured-preview-item">
+            <img src="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400&h=500&fit=crop" alt="Product 2">
+          </div>
+          <div class="featured-preview-item">
+            <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop" alt="Product 3">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Brands Section -->
+    <h2 class="brands-section-title">All Brands</h2>
+    <div class="brands-grid">
+      <!-- Nike -->
+      <div class="brand-card" onclick="openBrandDetail('nike')">
+        <div class="brand-card-header">
+          <div class="brand-logo">N</div>
+          <div class="brand-header-info">
+            <div class="brand-name">Nike</div>
+            <div class="brand-category">Athletic & Sportswear</div>
+          </div>
+        </div>
+        <div class="brand-preview">
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop" alt="Nike product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=500&fit=crop" alt="Nike product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&h=500&fit=crop" alt="Nike product">
+          </div>
+        </div>
+        <div class="brand-footer">
+          <div class="brand-points"><strong>9.8K</strong> points</div>
+          <button class="view-brand-btn">View Brand</button>
+        </div>
+      </div>
+
+      <!-- Patagonia -->
+      <div class="brand-card" onclick="openBrandDetail('patagonia')">
+        <div class="brand-card-header">
+          <div class="brand-logo">P</div>
+          <div class="brand-header-info">
+            <div class="brand-name">Patagonia</div>
+            <div class="brand-category">Sustainable Outdoor</div>
+          </div>
+        </div>
+        <div class="brand-preview">
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1608889476561-6242cfdbf622?w=400&h=500&fit=crop" alt="Patagonia product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1516442719524-a603408c90cb?w=400&h=500&fit=crop" alt="Patagonia product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=500&fit=crop" alt="Patagonia product">
+          </div>
+        </div>
+        <div class="brand-footer">
+          <div class="brand-points"><strong>8.2K</strong> points</div>
+          <button class="view-brand-btn">View Brand</button>
+        </div>
+      </div>
+
+      <!-- Carhartt -->
+      <div class="brand-card" onclick="openBrandDetail('carhartt')">
+        <div class="brand-card-header">
+          <div class="brand-logo">C</div>
+          <div class="brand-header-info">
+            <div class="brand-name">Carhartt WIP</div>
+            <div class="brand-category">Streetwear / Workwear</div>
+          </div>
+        </div>
+        <div class="brand-preview">
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop" alt="Carhartt product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop" alt="Carhartt product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400&h=500&fit=crop" alt="Carhartt product">
+          </div>
+        </div>
+        <div class="brand-footer">
+          <div class="brand-points"><strong>7.5K</strong> points</div>
+          <button class="view-brand-btn">View Brand</button>
+        </div>
+      </div>
+
+      <!-- The North Face -->
+      <div class="brand-card" onclick="openBrandDetail('northface')">
+        <div class="brand-card-header">
+          <div class="brand-logo">TNF</div>
+          <div class="brand-header-info">
+            <div class="brand-name">The North Face</div>
+            <div class="brand-category">Outdoor & Adventure</div>
+          </div>
+        </div>
+        <div class="brand-preview">
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1622260614153-03223fb72052?w=400&h=500&fit=crop" alt="TNF product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop" alt="TNF product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1620799139834-6b8f844fbe61?w=400&h=500&fit=crop" alt="TNF product">
+          </div>
+        </div>
+        <div class="brand-footer">
+          <div class="brand-points"><strong>6.9K</strong> points</div>
+          <button class="view-brand-btn">View Brand</button>
+        </div>
+      </div>
+
+      <!-- Stüssy -->
+      <div class="brand-card" onclick="openBrandDetail('stussy')">
+        <div class="brand-card-header">
+          <div class="brand-logo">S</div>
+          <div class="brand-header-info">
+            <div class="brand-name">Stüssy</div>
+            <div class="brand-category">Streetwear Classic</div>
+          </div>
+        </div>
+        <div class="brand-preview">
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&h=500&fit=crop" alt="Stussy product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=400&h=500&fit=crop" alt="Stussy product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&h=500&fit=crop" alt="Stussy product">
+          </div>
+        </div>
+        <div class="brand-footer">
+          <div class="brand-points"><strong>5.8K</strong> points</div>
+          <button class="view-brand-btn">View Brand</button>
+        </div>
+      </div>
+
+      <!-- Lululemon -->
+      <div class="brand-card" onclick="openBrandDetail('lululemon')">
+        <div class="brand-card-header">
+          <div class="brand-logo">L</div>
+          <div class="brand-header-info">
+            <div class="brand-name">Lululemon</div>
+            <div class="brand-category">Athletic & Lifestyle</div>
+          </div>
+        </div>
+        <div class="brand-preview">
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&h=500&fit=crop" alt="Lululemon product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=500&fit=crop" alt="Lululemon product">
+          </div>
+          <div class="brand-preview-item">
+            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop" alt="Lululemon product">
+          </div>
+        </div>
+        <div class="brand-footer">
+          <div class="brand-points"><strong>5.3K</strong> points</div>
+          <button class="view-brand-btn">View Brand</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/pages/brand-of-the-day.js"></script>
+  <script type="module" src="/assets/js/pages/page-defaults.js"></script>
+  <script type="module" src="/assets/js/components/load-user.js"></script>
+</body>
+</html>

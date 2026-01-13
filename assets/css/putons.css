@@ -1,4 +1,4 @@
-/* Wishlist Styles */
+/* Put Ons Styles */
 
 html, body {
   margin: 0;
@@ -6,20 +6,20 @@ html, body {
   font-family: Arial, sans-serif;
 }
 
-#wishlist-root,
-#wishlist-root * {
+.putons-root,
+.putons-root * {
   box-sizing: border-box;
 }
 
-#wishlist-root {
+.putons-root {
   min-height: 100vh;
   background: linear-gradient(to bottom right, #a7c5a0, #6b9080, #4a7c59);
   padding-top: 75px;
   position: relative;
 }
 
-/* Subtle texture overlay to match homepage */
-#wishlist-root::before {
+/* Subtle texture overlay */
+.putons-root::before {
   content: '';
   position: fixed;
   top: 0;
@@ -33,7 +33,7 @@ html, body {
   z-index: 0;
 }
 
-.wishlist-container {
+.putons-container {
   max-width: 80rem;
   margin: 0 auto;
   padding: 0 1rem;
@@ -41,8 +41,8 @@ html, body {
   z-index: 1;
 }
 
-/* Header - Softer, nature-inspired */
-.wishlist-header {
+/* Header */
+.putons-header {
   margin-bottom: 2rem;
   animation: fadeInDown 0.6s ease-out;
 }
@@ -58,7 +58,7 @@ html, body {
   }
 }
 
-.wishlist-title {
+.putons-title {
   font-size: 2.25rem;
   font-weight: 600;
   color: #2d4a3e;
@@ -66,12 +66,12 @@ html, body {
   letter-spacing: -0.5px;
 }
 
-.wishlist-subtitle {
+.putons-subtitle {
   color: #5a7a6b;
   font-weight: 400;
 }
 
-/* Search Bar - Enhanced Liquid Glass */
+/* Search Bar */
 .search-bar {
   margin-bottom: 1.5rem;
   animation: fadeInUp 0.6s ease-out 0.1s both;
@@ -100,61 +100,39 @@ html, body {
   }
 }
 
-.search-input-wrapper {
+/* Search Input */
+.search-input {
   flex: 1;
-  position: relative;
-}
-
-.search-input-wrapper svg {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(0, 0, 0, 0.55);
-  pointer-events: none;
-}
-
-/* Liquid Glass Input */
-.liquid-input {
   width: 100%;
-  padding: 12px 16px 12px 2.5rem;
+  padding: 12px 16px;
   font-size: 1rem;
-  background: none;
-  border: none;
-  backdrop-filter: none;
+  background: rgba(217, 217, 217, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(7px);
+  border-radius: 14px;
+  box-shadow: 8px 12px 35px rgba(0,0,0,0.18);
   outline: none;
   color: #000;
   transition: all 0.35s ease;
 }
 
-.liquid-input::placeholder {
+.search-input::placeholder {
   color: rgba(0, 0, 0, 0.55);
   font-weight: 400;
 }
 
-.liquid-input:focus {
+.search-input:hover {
+  transform: scale(1.01);
+  border-color: #000;
+}
+
+.search-input:focus {
   border-color: rgba(0, 0, 0, 0.85);
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
 }
 
-/* Liquid Glass Container */
-.liquid-container {
-  background: rgba(217, 217, 217, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(7px);
-  border-radius: 18px;
-  box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.22);
-  padding: 1rem;
-  transition: all 0.4s ease;
-}
-
-.liquid-container:hover {
-  transform: scale(1.00);
-  border-color: #000;
-}
-
-/* Liquid Glass Dropdown */
-.liquid-select {
+/* Category Select */
+.category-select {
   padding: 12px 16px;
   font-size: 1rem;
   min-width: 150px;
@@ -169,40 +147,68 @@ html, body {
   transition: all 0.35s ease;
 }
 
-.liquid-select:hover {
+.category-select:hover {
   transform: scale(1.03);
   border-color: #000;
 }
 
-.liquid-select:focus {
+.category-select:focus {
   border-color: rgba(0,0,0,0.85);
   box-shadow: 0 0 12px rgba(0,0,0,0.25);
 }
 
-/* Wishlist Grid */
-.wishlist-grid {
+/* Add Button */
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 16px;
+  background: rgba(74, 124, 89, 0.9);
+  backdrop-filter: blur(6px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 8px 12px 35px rgba(0, 0, 0, 0.18);
+  transition: all 0.35s ease;
+  white-space: nowrap;
+}
+
+.add-button:hover {
+  background: rgba(45, 106, 79, 0.95);
+  transform: scale(1.05);
+}
+
+.add-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Put Ons Grid */
+.putons-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
 }
 
 @media (min-width: 768px) {
-  .wishlist-grid {
+  .putons-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .wishlist-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .putons-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
-/* Wishlist Card - Liquid Glass Style */
-.wishlist-card {
+/* Put On Card */
+.puton-card {
   background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 16px;
   overflow: hidden;
   position: relative;
@@ -210,16 +216,18 @@ html, body {
   transition: all 0.3s ease;
   animation: fadeInUp 0.5s ease-out both;
   animation-delay: calc(var(--card-index, 0) * 0.05s);
+  display: flex;
+  flex-direction: column;
 }
 
-.wishlist-card:hover {
+.puton-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   border-color: rgba(107, 144, 128, 0.8);
 }
 
 .item-image-wrapper {
-  aspect-ratio: 4/3;
+  aspect-ratio: 5/3;
   background: rgba(243, 244, 246, 0.5);
   position: relative;
   overflow: hidden;
@@ -232,7 +240,7 @@ html, body {
   transition: transform 0.3s ease;
 }
 
-.wishlist-card:hover .item-image {
+.puton-card:hover .item-image {
   transform: scale(1.05);
 }
 
@@ -251,7 +259,7 @@ html, body {
   transition: all 0.3s ease;
 }
 
-.wishlist-card:hover .delete-btn {
+.puton-card:hover .delete-btn {
   opacity: 1;
 }
 
@@ -269,6 +277,9 @@ html, body {
 .item-content {
   padding: 1.25rem;
   background: rgba(255, 255, 255, 0.2);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .item-name {
@@ -293,21 +304,11 @@ html, body {
   margin-bottom: 0.5rem;
 }
 
-.item-store {
+.item-brand, .item-color, .item-size {
   font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-}
-
-.item-store a {
   color: #4a7c59;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.item-store a:hover {
-  color: #2d4a3e;
-  text-decoration: underline;
+  margin-bottom: 0.25rem;
+  min-height: 1.25rem;
 }
 
 .item-notes {
@@ -329,7 +330,7 @@ html, body {
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
-  margin-top: 0.75rem;
+  margin-top: auto;
   transition: all 0.3s ease;
 }
 
@@ -339,7 +340,7 @@ html, body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Empty State - Frosted Glass */
+/* Empty State */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -353,7 +354,7 @@ html, body {
   animation: fadeInUp 0.6s ease-out;
 }
 
-.empty-state .empty-icon {
+.empty-state svg {
   width: 64px;
   height: 64px;
   color: rgba(90, 122, 107, 0.6);
@@ -373,7 +374,7 @@ html, body {
   font-size: 1rem;
 }
 
-/* Modal - Frosted Glass */
+/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -451,47 +452,20 @@ html, body {
   height: 24px;
 }
 
-/* Method Tabs */
-.method-tabs {
-  display: flex;
-  gap: 0.5rem;
+/* Modal Body */
+.modal-body {
   margin-bottom: 1rem;
-}
-
-.method-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border-radius: 12px;
-  border: 1px solid rgba(217, 217, 217, 0.5);
-  cursor: pointer;
-  background: rgba(243, 244, 246, 0.5);
-  color: #5a7a6b;
-  transition: all 0.3s ease;
-}
-
-.method-tab.active {
-  background: rgba(74, 124, 89, 0.9);
-  backdrop-filter: blur(4px);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.method-tab:hover:not(.active) {
-  background: rgba(217, 217, 217, 0.7);
-}
-
-.method-tab svg {
-  width: 18px;
-  height: 18px;
 }
 
 /* Form Elements */
 .form-group {
   margin-bottom: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 .form-label {
@@ -502,7 +476,7 @@ html, body {
   margin-bottom: 0.5rem;
 }
 
-.form-input, .form-textarea {
+.form-input, .form-textarea, .form-select {
   width: 100%;
   padding: 0.625rem 0.875rem;
   border: 1px solid rgba(209, 213, 219, 0.6);
@@ -514,7 +488,9 @@ html, body {
   transition: all 0.3s ease;
 }
 
-.form-input:focus, .form-textarea:focus {
+.form-input:focus, 
+.form-textarea:focus,
+.form-select:focus {
   outline: none;
   border-color: rgba(74, 124, 89, 0.8);
   background: rgba(255, 255, 255, 0.9);
@@ -525,11 +501,14 @@ html, body {
   resize: vertical;
 }
 
-.image-preview {
+/* Image Preview */
+.image-preview-container {
   margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.preview-img {
+.image-preview {
   width: 100%;
   height: 12rem;
   object-fit: cover;

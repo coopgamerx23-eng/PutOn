@@ -189,21 +189,8 @@ async function loadUserPosts() {
                         <div></div><div></div><div></div><div></div><div></div>
                         <div></div><div></div><div></div><div></div><div></div>
                     </div>
-                    <div class="post-item">
+                    <div class="post-item" onclick="openEditModal('${post.url}')" style="cursor: pointer;">
                         <img src="${post.url}" alt="${post.caption || 'User post'}">
-                        <div class="post-overlay">
-                            <button class="edit-post-btn" onclick="event.stopPropagation(); openEditModal('${post.url}')" style="background: rgba(33, 150, 243, 0.9); border: 2px solid white; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); margin-right: 12px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                </svg>
-                            </button>
-                            <button class="delete-post-btn" onclick="deletePost('${post.url}', this)">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                                </svg>
-                            </button>
-                        </div>
                     </div>
                 `;
                 
@@ -265,7 +252,7 @@ async function loadLikedPosts() {
                         <div></div><div></div><div></div><div></div><div></div>
                         <div></div><div></div><div></div><div></div><div></div>
                     </div>
-                    <div class="post-item" onclick="window.location.href='/?view=${encodeURIComponent(post.post_url)}'" style="cursor: pointer;">
+                    <div class="post-item" onclick="openEditModal('${post.post_url}', true)" style="cursor: pointer;">
                         <img src="${post.post_url}" alt="Liked post">
                     </div>
                 `;
@@ -319,7 +306,7 @@ async function loadSavedPosts() {
                         <div></div><div></div><div></div><div></div><div></div>
                         <div></div><div></div><div></div><div></div><div></div>
                     </div>
-                    <div class="post-item" onclick="window.location.href='/?view=${encodeURIComponent(post.post_url)}'" style="cursor: pointer;">
+                    <div class="post-item" onclick="openEditModal('${post.post_url}', true)" style="cursor: pointer;">
                         <img src="${post.post_url}" alt="Saved post">
                     </div>
                 `;
@@ -373,7 +360,7 @@ async function loadRepostedPosts() {
                         <div></div><div></div><div></div><div></div><div></div>
                         <div></div><div></div><div></div><div></div><div></div>
                     </div>
-                    <div class="post-item" onclick="window.location.href='/?view=${encodeURIComponent(post.post_url)}'" style="cursor: pointer;">
+                    <div class="post-item" onclick="openEditModal('${post.post_url}', true)" style="cursor: pointer;">
                         <img src="${post.post_url}" alt="Reposted post">
                     </div>
                 `;
@@ -404,12 +391,22 @@ async function loadRepostedPosts() {
 }
 
 // Delete a post
-window.deletePost = async function(postUrl, button) {
-    if (!confirm('Are you sure you want to delete this post?')) {
+// Delete post from modal
+window.deletePostFromModal = async function() {
+    if (!currentEditingPost) return;
+    
+    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
         return;
     }
     
-    const filename = postUrl.split('/').pop();
+    const filename = currentEditingPost.url.split('/').pop();
+    
+    // Disable save button to prevent accidental clicks
+    const saveBtn = document.getElementById('saveEditBtn');
+    const deleteBtn = document.querySelector('.btn-delete');
+    saveBtn.disabled = true;
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting...';
     
     try {
         const response = await fetch(`/api/posts/${filename}`, {
@@ -420,32 +417,29 @@ window.deletePost = async function(postUrl, button) {
         const data = await response.json();
         
         if (data.success) {
-            const postWrapper = button.closest('.post-item-wrapper');
-            postWrapper.style.transition = 'all 0.3s';
-            postWrapper.style.opacity = '0';
-            postWrapper.style.transform = 'scale(0.8)';
+            showNotification('Post deleted successfully!', 'success');
+            closeEditModal();
             
+            // Reload posts after a brief delay
             setTimeout(() => {
-                postWrapper.remove();
-                
-                const remainingPosts = document.querySelectorAll('.post-item-wrapper');
-                if (remainingPosts.length === 0) {
-                    const postsGrid = document.getElementById('postsGrid');
-                    const emptyMessage = document.createElement('div');
-                    emptyMessage.className = 'empty-posts-message';
-                    emptyMessage.innerHTML = `
-                        <p>No posts yet</p>
-                        <small>Click the + button to create your first post!</small>
-                    `;
-                    postsGrid.appendChild(emptyMessage);
-                }
-            }, 300);
+                loadUserPosts();
+            }, 500);
         } else {
-            alert('Failed to delete post: ' + data.message);
+            throw new Error(data.message || 'Failed to delete post');
         }
     } catch (error) {
         console.error('Error deleting post:', error);
-        alert('Error deleting post. Please try again.');
+        showNotification('Failed to delete post. Please try again.', 'error');
+        
+        // Re-enable buttons on error
+        saveBtn.disabled = false;
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            </svg>
+            Delete Post
+        `;
     }
 };
 
@@ -627,7 +621,7 @@ let selectedEditTags = {
 };
 
 // Open edit modal
-window.openEditModal = async function(postUrl) {
+window.openEditModal = async function(postUrl, isViewOnly = false) {
     const modal = document.getElementById('editPostModal');
     const loading = document.getElementById('editLoading');
     const formContent = document.getElementById('editFormContent');
@@ -648,19 +642,59 @@ window.openEditModal = async function(postUrl) {
         
         currentEditingPost = postData;
         
-        // Load wardrobe items
-        const wardrobeResponse = await fetch('/api/wardrobe', {
-            credentials: 'include'
-        });
-        const wardrobeData = await wardrobeResponse.json();
+        // Load wardrobe items (only for own posts)
+        if (!isViewOnly) {
+            const wardrobeResponse = await fetch('/api/wardrobe', {
+                credentials: 'include'
+            });
+            const wardrobeData = await wardrobeResponse.json();
+            
+            if (wardrobeData.success) {
+                allWardrobeItems = wardrobeData.items;
+            }
+        }
         
-        if (wardrobeData.success) {
-            allWardrobeItems = wardrobeData.items;
+        // Get interaction stats
+        let interactionStats = {
+            likes: 0,
+            reposts: 0,
+            saves: 0
+        };
+        
+        try {
+            const encodedUrl = encodeURIComponent(postUrl);
+            const statsResponse = await fetch(`/api/posts/interactions/${encodedUrl}`, {
+                credentials: 'include'
+            });
+            const statsData = await statsResponse.json();
+            if (statsData.success) {
+                interactionStats = {
+                    likes: statsData.likes || 0,
+                    reposts: statsData.reposts || 0,
+                    saves: statsData.saves || 0
+                };
+            }
+        } catch (error) {
+            console.log('Could not load interaction stats');
         }
         
         // Populate form
         document.getElementById('editPostImage').src = postData.url;
-        document.getElementById('editCaption').value = postData.caption || '';
+        const captionElement = document.getElementById('editCaption');
+        
+        if (isViewOnly) {
+            // View-only mode: Make caption read-only
+            captionElement.value = postData.caption || 'No caption';
+            captionElement.disabled = true;
+            captionElement.style.background = '#f5f5f5';
+            captionElement.style.cursor = 'default';
+        } else {
+            // Edit mode: Allow editing
+            captionElement.value = postData.caption || '';
+            captionElement.disabled = false;
+            captionElement.style.background = '';
+            captionElement.style.cursor = '';
+        }
         
         // Set selected tags
         selectedEditTags = {
@@ -673,8 +707,75 @@ window.openEditModal = async function(postUrl) {
         selectedWardrobeItemIds = (postData.wardrobeItems || []).map(item => item.id);
         
         // Update UI
-        updateTagsUI();
-        displayEditWardrobeItems();
+        updateTagsUI(isViewOnly);
+        displayTaggedWardrobeItems(postData.wardrobeItems || []);
+        
+        if (!isViewOnly) {
+            displayEditWardrobeItems();
+            // Show the Add/Remove section for own posts
+            document.querySelector('.view-post-section:has(#addItemsBtn)').style.display = 'block';
+        } else {
+            // Hide the Add/Remove section for other posts
+            document.querySelector('.view-post-section:has(#addItemsBtn)').style.display = 'none';
+        }
+        
+        // Populate engagement stats
+        const statsHtml = `
+            <div class="view-stat-item">
+                <span class="view-stat-value">${interactionStats.likes}</span>
+                <span class="view-stat-label">Likes</span>
+            </div>
+            <div class="view-stat-item">
+                <span class="view-stat-value">${interactionStats.reposts}</span>
+                <span class="view-stat-label">Reposts</span>
+            </div>
+            <div class="view-stat-item">
+                <span class="view-stat-value">${interactionStats.saves}</span>
+                <span class="view-stat-label">Saves</span>
+            </div>
+        `;
+        document.getElementById('postStats').innerHTML = statsHtml;
+        
+        // Posted by section
+        if (postData.userName) {
+            document.getElementById('postedBySection').innerHTML = `
+                <h4>Posted By</h4>
+                <p class="view-post-caption">@${escapeHtml(postData.userName)}</p>
+            `;
+        } else {
+            document.getElementById('postedBySection').innerHTML = '';
+        }
+        
+        // Posted on section
+        if (postData.timestamp) {
+            const date = new Date(postData.timestamp);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('postedOnSection').innerHTML = `
+                <h4>Posted On</h4>
+                <p class="view-post-caption">${formattedDate}</p>
+            `;
+        } else {
+            document.getElementById('postedOnSection').innerHTML = '';
+        }
+        
+        // Show/hide footer buttons based on mode
+        const deleteBtn = document.querySelector('.btn-delete');
+        const saveBtn = document.getElementById('saveEditBtn');
+        const cancelBtn = document.querySelector('.btn-cancel');
+        
+        if (isViewOnly) {
+            deleteBtn.style.display = 'none';
+            saveBtn.style.display = 'none';
+            cancelBtn.textContent = 'Close';
+        } else {
+            deleteBtn.style.display = 'flex';
+            saveBtn.style.display = 'block';
+            cancelBtn.textContent = 'Cancel';
+        }
         
         loading.classList.remove('active');
         formContent.style.display = 'block';
@@ -696,29 +797,80 @@ window.closeEditModal = function() {
 };
 
 // Display wardrobe items
-function displayEditWardrobeItems() {
-    const grid = document.getElementById('editWardrobeGrid');
+function displayTaggedWardrobeItems(wardrobeItems) {
+    const grid = document.getElementById('taggedWardrobeGrid');
     
-    if (allWardrobeItems.length === 0) {
-        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No wardrobe items available</p>';
+    if (!wardrobeItems || wardrobeItems.length === 0) {
+        grid.innerHTML = `
+            <div class="no-tagged-items">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p>No wardrobe items tagged</p>
+            </div>
+        `;
         return;
     }
     
-    grid.innerHTML = allWardrobeItems.map(item => `
-        <div class="wardrobe-item ${selectedWardrobeItemIds.includes(item.id) ? 'selected' : ''}" 
-             data-id="${item.id}" 
-             onclick="toggleWardrobeItemEdit(${item.id})">
+    grid.innerHTML = wardrobeItems.map(item => `
+        <div class="view-wardrobe-item selected" data-id="${item.id}">
             <img src="${item.image}" alt="${item.name}" onerror="this.src='/assets/images/icons/placeholder.jpg'">
-            <div class="wardrobe-item-name">${item.name}</div>
+            <div class="view-wardrobe-info">
+                <div class="view-wardrobe-name">${escapeHtml(item.name)}</div>
+                <div class="view-wardrobe-details">
+                    ${item.brand ? escapeHtml(item.brand) : ''} ${item.color ? '• ' + escapeHtml(item.color) : ''}
+                    ${item.size ? '• ' + escapeHtml(item.size) : ''}
+                </div>
+            </div>
             <div class="check-mark">✓</div>
         </div>
     `).join('');
 }
 
+function displayEditWardrobeItems() {
+    const grid = document.getElementById('editWardrobeGrid');
+    
+    if (allWardrobeItems.length === 0) {
+        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 20px; font-size: 12px;">No wardrobe items available</p>';
+        return;
+    }
+    
+    grid.innerHTML = allWardrobeItems.map(item => `
+        <div class="view-wardrobe-item ${selectedWardrobeItemIds.includes(item.id) ? 'selected' : ''}" 
+             data-id="${item.id}" 
+             onclick="toggleWardrobeItemEdit(${item.id})">
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='/assets/images/icons/placeholder.jpg'">
+            <div class="view-wardrobe-info">
+                <div class="view-wardrobe-name">${escapeHtml(item.name)}</div>
+                <div class="view-wardrobe-details">
+                    ${item.brand ? escapeHtml(item.brand) : ''} ${item.color ? '• ' + escapeHtml(item.color) : ''}
+                    ${item.size ? '• ' + escapeHtml(item.size) : ''}
+                </div>
+            </div>
+            <div class="check-mark">✓</div>
+        </div>
+    `).join('');
+}
+
+window.toggleAddItemsSection = function() {
+    const section = document.getElementById('addItemsSection');
+    const button = document.getElementById('addItemsBtn');
+    
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        button.classList.add('active');
+    } else {
+        section.style.display = 'none';
+        button.classList.remove('active');
+    }
+};
+
 // Toggle wardrobe item selection
 window.toggleWardrobeItemEdit = function(itemId) {
     const index = selectedWardrobeItemIds.indexOf(itemId);
-    const itemElement = document.querySelector(`#editWardrobeGrid .wardrobe-item[data-id="${itemId}"]`);
+    const itemElement = document.querySelector(`#editWardrobeGrid .view-wardrobe-item[data-id="${itemId}"]`);
     
     if (index > -1) {
         selectedWardrobeItemIds.splice(index, 1);
@@ -727,10 +879,13 @@ window.toggleWardrobeItemEdit = function(itemId) {
         selectedWardrobeItemIds.push(itemId);
         itemElement.classList.add('selected');
     }
+    
+    // Update the tagged items display
+    displayTaggedWardrobeItems();
 };
 
 // Update tags UI
-function updateTagsUI() {
+function updateTagsUI(isViewOnly = false) {
     // Gender tags
     document.querySelectorAll('#editGenderTags .tag-option').forEach(tag => {
         const tagValue = tag.dataset.tag;
@@ -738,6 +893,15 @@ function updateTagsUI() {
             tag.classList.add('selected');
         } else {
             tag.classList.remove('selected');
+        }
+        
+        // Disable clicking in view-only mode
+        if (isViewOnly) {
+            tag.style.pointerEvents = 'none';
+            tag.style.cursor = 'default';
+        } else {
+            tag.style.pointerEvents = '';
+            tag.style.cursor = 'pointer';
         }
     });
     
@@ -749,6 +913,14 @@ function updateTagsUI() {
         } else {
             tag.classList.remove('selected');
         }
+        
+        if (isViewOnly) {
+            tag.style.pointerEvents = 'none';
+            tag.style.cursor = 'default';
+        } else {
+            tag.style.pointerEvents = '';
+            tag.style.cursor = 'pointer';
+        }
     });
     
     // Season tags
@@ -758,6 +930,14 @@ function updateTagsUI() {
             tag.classList.add('selected');
         } else {
             tag.classList.remove('selected');
+        }
+        
+        if (isViewOnly) {
+            tag.style.pointerEvents = 'none';
+            tag.style.cursor = 'default';
+        } else {
+            tag.style.pointerEvents = '';
+            tag.style.cursor = 'pointer';
         }
     });
 }
@@ -833,10 +1013,10 @@ window.savePostEdit = async function() {
             showNotification('Post updated successfully!', 'success');
             closeEditModal();
             
-            // Reload the page to show updated data
+            // Reload posts after a brief delay
             setTimeout(() => {
-                location.reload();
-            }, 1000);
+                loadUserPosts();
+            }, 500);
         } else {
             throw new Error(data.message || 'Failed to update post');
         }
@@ -852,7 +1032,6 @@ window.savePostEdit = async function() {
 // Initialize edit modal handlers when DOM loads
 const originalDOMContentLoaded = document.addEventListener;
 document.addEventListener('DOMContentLoaded', () => {
-    // Wait a bit for the modal HTML to be in the DOM
     setTimeout(() => {
         initEditTagHandlers();
         
@@ -867,3 +1046,173 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 100);
 });
+
+window.openViewModal = async function(postUrl) {
+    const modal = document.getElementById('viewPostModal');
+    const modalBody = document.getElementById('viewModalBody');
+    const postImage = document.getElementById('viewPostImage');
+    
+    modal.classList.add('active');
+    modalBody.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+    postImage.src = postUrl;
+    
+    try {
+        // Load post data from images.json
+        const response = await fetch('/data/images.json');
+        const imagesData = await response.json();
+        const postData = imagesData.find(img => img.url === postUrl);
+        
+        if (!postData) {
+            throw new Error('Post not found');
+        }
+        
+        // Get interaction stats
+        let interactionStats = {
+            likes: 0,
+            reposts: 0,
+            saves: 0
+        };
+        
+        try {
+            const encodedUrl = encodeURIComponent(postUrl);
+            const statsResponse = await fetch(`/api/posts/interactions/${encodedUrl}`, {
+                credentials: 'include'
+            });
+            const statsData = await statsResponse.json();
+            if (statsData.success) {
+                interactionStats = {
+                    likes: statsData.likes || 0,
+                    reposts: statsData.reposts || 0,
+                    saves: statsData.saves || 0
+                };
+            }
+        } catch (error) {
+            console.log('Could not load interaction stats');
+        }
+        
+        // Build modal content
+        let content = '';
+        
+        // Caption section
+        if (postData.caption) {
+            content += `
+                <div class="view-post-section">
+                    <h4>Caption</h4>
+                    <p class="view-post-caption">${escapeHtml(postData.caption)}</p>
+                </div>
+            `;
+        }
+        
+        // Tags section
+        const allTags = [
+            ...(postData.Gender || []),
+            ...(postData.Style || []),
+            ...(postData.Season || [])
+        ];
+        
+        if (allTags.length > 0) {
+            content += `
+                <div class="view-post-section">
+                    <h4>Tags</h4>
+                    <div class="view-post-tags">
+                        ${allTags.map(tag => `<span class="view-tag">${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Wardrobe items section
+        if (postData.wardrobeItems && postData.wardrobeItems.length > 0) {
+            content += `
+                <div class="view-post-section">
+                    <h4>Tagged Items (${postData.wardrobeItems.length})</h4>
+                    <div class="view-wardrobe-grid">
+                        ${postData.wardrobeItems.map(item => `
+                            <div class="view-wardrobe-item">
+                                <img src="${item.image}" alt="${escapeHtml(item.name)}" onerror="this.src='/assets/images/icons/placeholder.jpg'">
+                                <div class="view-wardrobe-info">
+                                    <div class="view-wardrobe-name">${escapeHtml(item.name)}</div>
+                                    <div class="view-wardrobe-details">
+                                        ${item.brand ? escapeHtml(item.brand) : ''} ${item.color ? '• ' + escapeHtml(item.color) : ''}
+                                        ${item.size ? '• ' + escapeHtml(item.size) : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Stats section
+        content += `
+            <div class="view-post-section">
+                <h4>Engagement</h4>
+                <div class="view-post-stats">
+                    <div class="view-stat-item">
+                        <span class="view-stat-value">${interactionStats.likes}</span>
+                        <span class="view-stat-label">Likes</span>
+                    </div>
+                    <div class="view-stat-item">
+                        <span class="view-stat-value">${interactionStats.reposts}</span>
+                        <span class="view-stat-label">Reposts</span>
+                    </div>
+                    <div class="view-stat-item">
+                        <span class="view-stat-value">${interactionStats.saves}</span>
+                        <span class="view-stat-label">Saves</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Posted by section
+        if (postData.userName) {
+            content += `
+                <div class="view-post-section">
+                    <h4>Posted By</h4>
+                    <p class="view-post-caption">@${escapeHtml(postData.userName)}</p>
+                </div>
+            `;
+        }
+        
+        // Timestamp
+        if (postData.timestamp) {
+            const date = new Date(postData.timestamp);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            content += `
+                <div class="view-post-section">
+                    <h4>Posted On</h4>
+                    <p class="view-post-caption">${formattedDate}</p>
+                </div>
+            `;
+        }
+        
+        modalBody.innerHTML = content || '<div class="empty-view-state"><p>No details available</p></div>';
+        
+    } catch (error) {
+        console.error('Error loading post details:', error);
+        modalBody.innerHTML = `
+            <div class="empty-view-state">
+                <h3>Error Loading Post</h3>
+                <p>Could not load post details. Please try again.</p>
+            </div>
+        `;
+    }
+};
+
+// Close view modal
+window.closeViewModal = function() {
+    const modal = document.getElementById('viewPostModal');
+    modal.classList.remove('active');
+};
+
+// Helper function to escape HTML (add if not already present)
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
