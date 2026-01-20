@@ -1,0 +1,343 @@
+{
+  "arcteryx": {
+    "id": "arcteryx",
+    "name": "Arc'teryx",
+    "category": "Technical Performance Wear",
+    "tagline": "Discover today's featured fashion brand and their most notable pieces",
+    "description": "Arc'teryx is a Canadian high-performance outdoor equipment company known for its technical apparel and climbing gear. Founded in North Vancouver in 1989, the brand has built a reputation for precision design, meticulous craftsmanship, and innovative materials.",
+    "founded": "1989",
+    "headquarters": "North Vancouver, Canada",
+    "origin": "Canada",
+    "website": "https://arcteryx.com",
+    "heroImage": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Most Notable Pieces",
+    "ctaTitle": "Explore Arc'teryx Collection",
+    "ctaText": "Discover the full range of technical apparel and gear designed for any adventure",
+    "ctaButtonText": "Visit Brand Store",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$$$-$$$$"
+      }
+    ],
+    "products": [
+      {
+        "name": "Beta LT Jacket",
+        "price": "$575",
+        "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=500&fit=crop",
+        "link": "https://arcteryx.com/beta-lt"
+      },
+      {
+        "name": "Atom LT Hoody",
+        "price": "$329",
+        "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Gamma MX Hoody",
+        "price": "$399",
+        "image": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Alpha SV Jacket",
+        "price": "$875",
+        "image": "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Aerios FL GTX",
+        "price": "$229",
+        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Mantis 26 Backpack",
+        "price": "$165",
+        "image": "https://images.unsplash.com/photo-1622260614153-03223fb72052?w=400&h=500&fit=crop"
+      }
+    ]
+  },
+  "nike": {
+    "id": "nike",
+    "name": "Nike",
+    "category": "Athletic & Sportswear",
+    "tagline": "Just Do It - Discover the world's leading athletic brand",
+    "description": "Nike is a global leader in athletic footwear, apparel, and equipment. Founded in 1964 as Blue Ribbon Sports, the company has grown to become one of the world's most recognizable brands. With innovation at its core, Nike continues to push the boundaries of athletic performance and style.",
+    "founded": "1964",
+    "headquarters": "Beaverton, Oregon",
+    "origin": "United States",
+    "website": "https://nike.com",
+    "heroImage": "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Iconic Products",
+    "ctaTitle": "Explore Nike Collection",
+    "ctaText": "Experience innovation and performance with Nike's complete range of athletic gear",
+    "ctaButtonText": "Shop Nike",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$$-$$$"
+      }
+    ],
+    "products": [
+      {
+        "name": "Air Jordan 1",
+        "price": "$170",
+        "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Air Max 90",
+        "price": "$130",
+        "image": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Dunk Low",
+        "price": "$110",
+        "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&h=500&fit=crop"
+      }
+    ]
+  },
+  "patagonia": {
+    "id": "patagonia",
+    "name": "Patagonia",
+    "category": "Sustainable Outdoor",
+    "tagline": "We're in business to save our home planet",
+    "description": "Patagonia is an American outdoor clothing company committed to environmental activism and sustainability. Founded in 1973 by Yvon Chouinard, the brand has become synonymous with responsible manufacturing and environmental stewardship. Every product is built to last, reducing the need for frequent replacements.",
+    "founded": "1973",
+    "headquarters": "Ventura, California",
+    "origin": "United States",
+    "website": "https://patagonia.com",
+    "heroImage": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Sustainable Classics",
+    "ctaTitle": "Explore Patagonia's Mission",
+    "ctaText": "Join us in building the best product and causing no unnecessary harm",
+    "ctaButtonText": "Shop Patagonia",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$$-$$$"
+      },
+      {
+        "label": "Commitment",
+        "value": "1% for the Planet"
+      }
+    ],
+    "products": [
+      {
+        "name": "Synchilla Snap-T",
+        "price": "$149",
+        "image": "https://images.unsplash.com/photo-1608889476561-6242cfdbf622?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Better Sweater",
+        "price": "$139",
+        "image": "https://images.unsplash.com/photo-1516442719524-a603408c90cb?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Nano Puff Jacket",
+        "price": "$249",
+        "image": "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Torrentshell Jacket",
+        "price": "$179",
+        "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=500&fit=crop"
+      }
+    ]
+  },
+  "carhartt": {
+    "id": "carhartt",
+    "name": "Carhartt WIP",
+    "category": "Streetwear / Workwear",
+    "tagline": "From the streets to the workshop - authentic workwear heritage",
+    "description": "Carhartt Work In Progress adapts the iconic workwear designs of the original Carhartt brand for a younger, urban audience. Founded in 1989, WIP has become a staple in streetwear culture while maintaining the durability and quality that made Carhartt famous since 1889. The brand bridges the gap between functional workwear and contemporary street fashion.",
+    "founded": "1989",
+    "headquarters": "Weil am Rhein, Germany",
+    "origin": "Germany (Parent: USA 1889)",
+    "website": "https://carhartt-wip.com",
+    "heroImage": "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Essential Workwear",
+    "ctaTitle": "Explore Carhartt WIP",
+    "ctaText": "Discover the intersection of durability, functionality, and street style",
+    "ctaButtonText": "Shop Carhartt WIP",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$-$$"
+      },
+      {
+        "label": "Heritage",
+        "value": "Since 1889"
+      }
+    ],
+    "products": [
+      {
+        "name": "Detroit Jacket",
+        "price": "$189",
+        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Active Jacket",
+        "price": "$129",
+        "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Simple Pant",
+        "price": "$89",
+        "image": "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Chase Sweatshirt",
+        "price": "$79",
+        "image": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop"
+      }
+    ]
+  },
+  "northface": {
+    "id": "northface",
+    "name": "The North Face",
+    "category": "Outdoor & Adventure",
+    "tagline": "Never Stop Exploring",
+    "description": "The North Face is an American outdoor recreation brand established in 1966. Known for pioneering technical innovations in mountaineering and outdoor equipment, TNF has become a cultural icon bridging performance gear and lifestyle fashion. From the highest peaks to city streets, The North Face represents exploration and adventure.",
+    "founded": "1966",
+    "headquarters": "Denver, Colorado",
+    "origin": "United States",
+    "website": "https://thenorthface.com",
+    "heroImage": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Expedition Ready",
+    "ctaTitle": "Never Stop Exploring",
+    "ctaText": "Gear up for your next adventure with proven outdoor performance",
+    "ctaButtonText": "Shop The North Face",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$$-$$$"
+      },
+      {
+        "label": "Focus",
+        "value": "Mountain Athletics"
+      }
+    ],
+    "products": [
+      {
+        "name": "Nuptse Jacket",
+        "price": "$329",
+        "image": "https://images.unsplash.com/photo-1622260614153-03223fb72052?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Denali Fleece",
+        "price": "$179",
+        "image": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Borealis Backpack",
+        "price": "$99",
+        "image": "https://images.unsplash.com/photo-1620799139834-6b8f844fbe61?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Venture 2 Jacket",
+        "price": "$129",
+        "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=500&fit=crop"
+      }
+    ]
+  },
+  "stussy": {
+    "id": "stussy",
+    "name": "Stüssy",
+    "category": "Streetwear Classic",
+    "tagline": "Original streetwear since 1980",
+    "description": "Stüssy is a pioneering streetwear brand founded by Shawn Stüssy in Laguna Beach, California. Starting with surfboards bearing his signature scrawl, the brand evolved into one of the most influential names in street fashion. Stüssy's fusion of surf, skate, and hip-hop culture helped define the streetwear movement and continues to influence fashion globally.",
+    "founded": "1980",
+    "headquarters": "Irvine, California",
+    "origin": "United States",
+    "website": "https://stussy.com",
+    "heroImage": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Streetwear Essentials",
+    "ctaTitle": "Discover Stüssy Heritage",
+    "ctaText": "Explore four decades of authentic streetwear and culture",
+    "ctaButtonText": "Shop Stüssy",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$-$$"
+      },
+      {
+        "label": "Legacy",
+        "value": "OG Streetwear"
+      }
+    ],
+    "products": [
+      {
+        "name": "Stock Logo Hoodie",
+        "price": "$98",
+        "image": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Basic Stüssy Tee",
+        "price": "$45",
+        "image": "https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "8 Ball Fleece",
+        "price": "$128",
+        "image": "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Relaxed Denim",
+        "price": "$135",
+        "image": "https://images.unsplash.com/photo-1542272454315-7f6d60a0a9b8?w=400&h=500&fit=crop"
+      }
+    ]
+  },
+  "lululemon": {
+    "id": "lululemon",
+    "name": "Lululemon",
+    "category": "Athletic & Lifestyle",
+    "tagline": "The science of feel meets the art of design",
+    "description": "Lululemon is a Canadian athletic apparel retailer that revolutionized the athleisure movement. Founded in 1998 in Vancouver, the brand specializes in yoga-inspired technical athletic wear that seamlessly transitions from workout to everyday life. Known for innovation in fabric technology and community-driven retail experiences, Lululemon has become synonymous with premium athletic lifestyle.",
+    "founded": "1998",
+    "headquarters": "Vancouver, Canada",
+    "origin": "Canada",
+    "website": "https://lululemon.com",
+    "heroImage": "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1600&h=400&fit=crop",
+    "logoImage": "",
+    "productsTitle": "Performance Essentials",
+    "ctaTitle": "Elevate Your Practice",
+    "ctaText": "Experience technical innovation designed for how you move",
+    "ctaButtonText": "Shop Lululemon",
+    "additionalStats": [
+      {
+        "label": "Price Range",
+        "value": "$$-$$$"
+      },
+      {
+        "label": "Specialty",
+        "value": "Yoga & Training"
+      }
+    ],
+    "products": [
+      {
+        "name": "Align Leggings",
+        "price": "$98",
+        "image": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Define Jacket",
+        "price": "$128",
+        "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Scuba Hoodie",
+        "price": "$118",
+        "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=500&fit=crop"
+      },
+      {
+        "name": "Fast & Free Tights",
+        "price": "$128",
+        "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=500&fit=crop"
+      }
+    ]
+  }
+}

@@ -4,6 +4,11 @@ html, body {
   font-family: Arial, sans-serif;
 }
 
+.explore-page #header-placeholder {
+  background: rgba(0, 0, 0, 1);
+  backdrop-filter: blur(10px);
+}
+
 .explore-header {
     display: flex;
     position: fixed;
